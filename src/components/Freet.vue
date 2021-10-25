@@ -186,7 +186,7 @@
                 }
             },
             refreetHandler() {
-                // update to do something
+                
             },
             follow(obj) {
                 this.error = '';
