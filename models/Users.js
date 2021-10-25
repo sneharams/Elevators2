@@ -7,6 +7,7 @@ let id_num = 0;
  * @prop {string} username - username for account
  * @prop {string} password - password for account
  * @prop {array} following - users that account follows
+ * @prop {array} upvotes - all freets that user has liked 
 
  */
 
@@ -133,6 +134,29 @@ class Users {
         const user = Users.findUserByID(user_id);
         const followingNames = user.following.map(author => author.username);
         return followingNames;
+    }
+
+    /**
+     * Add upvoted freet to list 
+     * 
+     * @param   {string} freet_id       - the freet_id of the freet that was upvoted 
+     * @return  {string[]} - an array of upvoted freets
+     */
+     static addUpvotedFreet(freet_id) {
+        upvotes.push(freet_id); 
+        return upvotes;
+    }
+
+     /**
+     * Delete upvoted freet from list 
+     * 
+     * @param   {string} freet_id       - the freet_id of the freet that was upvoted 
+     * @return  {string[]} - an array of upvoted freets
+     */
+      static removeUpvotedFreet(freet_id) {
+        
+        upvotes.delete(freet_id);
+        return upvotes; 
     }
 }
 
