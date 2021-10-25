@@ -36,7 +36,7 @@
     </main>
 </template>
     
-<script src="../javascripts/services.js"></script>
+<script src="../public/services.js"></script>
 <script>
      import Response from './components/Response.vue';
      import UserOptions from './components/UserOptions.vue';

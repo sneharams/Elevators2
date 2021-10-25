@@ -34,7 +34,7 @@
     </section>
 </template>
 
-<script src="../javascripts/services.js"></script>
+<script src="../../public/services.js"></script>
 <script>
     import CredentialsForm from './CredentialsForm.vue';
     import UsernameForm from './UsernameForm.vue';

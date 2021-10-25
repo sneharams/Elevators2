@@ -17,7 +17,7 @@
     </span>
 </template>
 
-<script src="../javascripts/services.js"></script>
+<script src="../../public/services.js"></script>
 <script>
     import CreateFreetForm from './CreateFreetForm.vue';
     export default {
