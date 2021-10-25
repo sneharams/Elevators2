@@ -45,6 +45,7 @@ function createUser(fields, callbackSuccess, callbackFailure) {
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
 
+
 function changeUsername(fields, callbackSuccess, callbackFailure) {
   axios.put('/api/users/username', fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
@@ -113,6 +114,12 @@ function viewFreetsByFollowedAuthors(fields, callbackSuccess, callbackFailure) {
 
 function createFreet(fields, callbackSuccess, callbackFailure) {
   axios.post('/api/freets', fields)
+    .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
+    .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
+}
+
+function refreetFreet(fields, callbackSuccess, callbackFailure) {
+  axios.post('/api/freets/' + fields.parent_id, fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }

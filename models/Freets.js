@@ -13,6 +13,8 @@ let id_num = 0;
  * @prop {string} id      - id of the freet
  * @prop {string} content - the content of the freet
  * @prop {string} author  - username of the author
+ * @prop {freet} parent - parent freet (None if original freet)
+ * @prop {int} upvotes - number of upvotes of freet >=0 
  */
 
 /**
@@ -34,11 +36,27 @@ class Freets {
   static addOne(content, author, user_id) {
     const id = id_num.toString();
     const freet = {id, content, author};
-    const freet_obj = {id, user_id, freet};
+    const parent = None;
+    const upvotes = 0;
+    const freet_obj = {id, user_id, freet, parent,upvotes};
     id_num = id_num + 1;
     data.push(freet_obj);
     return freet_obj.freet;
   }
+
+  /**
+   * Add a freet to the collection.
+   * 
+   * @param  {string} content - the content of the freet
+   * @param  {string} author  - the username of the author
+   * @param  {string} user_id - the user_id of the author
+   * @return {int} - upvotes
+   */ 
+   static upvote() { 
+    upvotes = upvotes + 1;
+    return upvotes;
+  }
+
 
   /**
    * Find a freet by Id.
@@ -130,6 +148,27 @@ class Freets {
    */
   static deleteFreetsByAuthor(user_id) {
     data = data.filter(f => f.user_id !== user_id);
+  }
+
+
+  /**
+   * Refreet by a user.
+   * 
+   * @param  {string} content - the content of the freet
+   * @param  {string} author  - the username of the author
+   * @param  {string} user_id - the user_id of the author
+   * @param  {string} parent_id - the freet id of parent 
+   * @return {Freet} - the newly created freet
+   */ 
+  static refreet(content, author, user_id, parent_id) {
+    const id = id_num.toString();
+    const upvotes = 0; 
+    const parent = Freets.findOne(parent_id); 
+    const freet = {id, content, author, parent, upvotes};
+    const freet_obj = {id, user_id, freet}; 
+    id_num = id_num + 1; 
+    data.push(freet_obj);
+    return freet_obj.freet;
   }
 }
 

@@ -39,8 +39,12 @@
             </section>
         </span>
         <div class="content">{{ freet.content }}</div>
-        <div class="error" :style="{visibility: errorVis}">{{message}}</div>
-        <div class="editor" :style="{visibility: editorVis, height: editorHeight}">
+        <div v-if="parent_id !== None">    
+            <div class= "freet" : content > 
+            <input type="button" value="Click to view Original Freet" v-on:click="cancelHandler"/> 
+        </div>
+        <div class="error" :style="{visibility: message.length>0 ? 'visible' : 'hidden'}">{{message}}</div>
+        <div class="editor" :style="{visibility: isEditing ? 'visible' : 'hidden', height: isEditing ? '150px' : '0px'}">
             <section class="editHeader">
             <label>Edit Content</label>
                 <div class="editOptions">
@@ -64,8 +68,8 @@
                 v-on:click="upvoteHandler"
             />
             <input
-                type="button"
-                value="Refreet"
+                type="button" 
+                value="Refreet" 
                 v-on:click="refreetHandler"
             />
         </div>
@@ -74,6 +78,7 @@
 
 <script src="../javascripts/services.js"></script>
 <script>
+// if parent is not None then have clickable freet parent id number 
     export default {
         name: 'Freet',
         props: ['freet', 'user', 'followed'],
@@ -112,6 +117,7 @@
                     this.editorHeight = '0px';
                 }
             }
+            // refreet 
         },
         computed: {
             isAuthor: function() {
@@ -186,7 +192,11 @@
                 }
             },
             refreetHandler() {
-                // update to do something
+                this.error =  ''; 
+                const fields = { 
+                    parent_id: this.freet.id 
+                }; 
+                refreetFreet(fields, this.success, this.error);
             },
             follow(obj) {
                 this.error = '';

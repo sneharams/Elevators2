@@ -143,6 +143,33 @@ router.delete(
             freets: [freet]
         }
         res.status(200).json(msg).end();
-});    
+});   
+
+/**
+ * Refreet a freet.
+ * 
+ * @id POST api/freets
+ * 
+ * @param  {string} content - content freet contains
+ * @param  {string} parent_id - id of the freet user is refreeting 
+ * @return {Freets[]} - the created freet in an array
+ * @throws {403} - if the user isn't logged in
+ */ 
+ router.post( 
+    '/:parent_id?', 
+    [
+        validateThat.userIsLoggedIn,
+        validateThat.freetTextIsWithinLimit,
+        // can't refreet own freet, if parent gets deleted then (in freet say deleted)
+    ], 
+    (req, res) => {
+        const creator = Users.findUserByID(req.session.user_id).username;
+        const freet = Freets.refreet(req.body.content, creator, req.session.user_id, req.params.parent_id);
+        const msg = { 
+            msg: "Freet successfully refreeted!",
+            freets: [freet]
+        }
+        res.status(200).json(msg).end();
+});
 
 module.exports = router;
