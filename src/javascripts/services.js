@@ -63,6 +63,12 @@ function addAuthorToFollowed(fields, callbackSuccess, callbackFailure) {
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
 
+function removeAuthorFromFollowed(fields, callbackSuccess, callbackFailure) {
+  axios.delete('/api/users/followed', fields)
+    .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
+    .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
+}
+
 function getFollowedAuthors(fields, callbackSuccess, callbackFailure) {
   axios.get('/api/users/followed', fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)

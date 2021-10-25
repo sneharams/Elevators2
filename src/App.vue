@@ -36,11 +36,12 @@
     </main>
 </template>
     
+<script src="../javascripts/services.js"></script>
 <script>
      import Response from './components/Response.vue';
      import UserOptions from './components/UserOptions.vue';
      import FreetOptions from './components/FreetOptions.vue';
-import Following from './components/Following.vue';
+     import Following from './components/Following.vue';
      export default {
         name: 'app',
         components: {Response, UserOptions, FreetOptions, Following},

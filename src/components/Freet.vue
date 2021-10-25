@@ -123,7 +123,15 @@
             errorVis: function() {
                 return this.message.length>0 ? 'visible' : 'hidden'
             }
-
+        },
+        mounted() {
+            if (this.followed.includes(this.freet.author)) {
+                this.authorClass= 'followed';
+                this.isFollowing='Following';
+            } else {
+                this.authorClass= 'notFollowed';
+                this.isFollowing='Not Following';
+            }
         },
         methods: {
             optionsHandler() {
@@ -160,7 +168,12 @@
                 const fields = {
                     author: this.freet.author
                 }
-                addAuthorToFollowed(fields, this.follow, this.error);
+                if (this.isFollowing) {
+                    removeAuthorFromFollowed(fields, this.follow, this.error);
+                } else {
+                    addAuthorToFollowed(fields, this.follow, this.error);
+                }
+                
             },
             upvoteHandler() {
                 // update to actually function outside of client screen

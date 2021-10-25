@@ -110,6 +110,20 @@ class Users {
     }
 
     /**
+     * Remove an authors from the user's following array.
+     * 
+     * @param   {string} user_id       - the user_id of the user account
+     * @param   {string} author_name   - the username of the author to remove
+     * @return  {string[]} - an updated array of usernames of followed authors
+     */
+         static addAuthorToFollowed(user_id, author_name) {
+            const author = Users.findUser(author_name);
+            const user = Users.findUserByID(user_id);
+            user.following = user.following.filter(u => u.username !== author_name);
+            return Users.getUserFollowed(user_id);
+        }
+
+    /**
      * Get an array of the authors the user is following.
      * 
      * @param   {string} user_id       - the user_id of the user account

@@ -175,6 +175,29 @@ router.put(
     }
 )
 
+/**
+ * Remove an author from user's followed.
+ * 
+ * @id DELETE api/users/followed
+ * 
+ * @return  {string[]} - an array of usernames of authors
+ * @throws  {403} - if the user isn't logged in
+ */
+ router.delete(
+    '/followed/:author?',
+    [
+        validateThat.userIsLoggedIn,
+    ],
+    (req, res) => {
+        let followed = Users.removeAuthorFromFollowed(req.session.user_id, req.body.author);
+        let msg = {
+            msg: "Here is an updated array of who you follow.",
+            followed: followed
+        };
+        res.status(200).json(msg);
+    }
+)
+
 
 /**
  * Deletes a user account.
