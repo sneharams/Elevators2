@@ -4,20 +4,35 @@
         <h1>Fritter</h1>
         <UserOptions
             v-bind:isLoggedIn="isLoggedIn"
+            v-bind:vis="vis"
             v-on:sessionHandler="sessionHandler" 
         />
       </header>
       <FreetOptions
         v-bind:isLoggedIn="isLoggedIn"
+        v-bind:vis="vis"
         v-on:freetHandler="freetHandler"
         v-on:errorHandler="errorHandler"
       />
-      <Response 
-        v-bind:response="responseProps" 
-        v-bind:user="user"
-        v-on:delete="deleteHandler"
-        v-on:edit="editHandler"
-      />
+      <span class="main">
+        <Following
+          v-bind:key="follow"
+          v-bind:isLoggedIn="isLoggedIn"
+          v-bind:vis="vis"
+          v-bind:user="user"
+          v-on:freetHandler="freetHandler"
+          v-on:errorHandler="errorHandler"
+          v-on:followed="followedHandler"
+        />
+        <Response 
+          v-bind:response="responseProps" 
+          v-bind:followed="followed"
+          v-bind:user="user"
+          v-on:delete="deleteHandler"
+          v-on:edit="editHandler"
+          v-on:followedHandler="followedHandler"
+        />
+      </span>
     </main>
 </template>
     
@@ -25,9 +40,10 @@
      import Response from './components/Response.vue';
      import UserOptions from './components/UserOptions.vue';
      import FreetOptions from './components/FreetOptions.vue';
+import Following from './components/Following.vue';
      export default {
         name: 'app',
-        components: {Response, UserOptions, FreetOptions},
+        components: {Response, UserOptions, FreetOptions, Following},
         data() {
             return {
                 responseProps: {
@@ -36,7 +52,17 @@
                 },
                 isLoggedIn: false,
                 user: '',
+                follow: true,
+                followed: []
             }
+        },
+        computed: {
+          vis: function() {
+            if (this.isLoggedIn) {
+              return 'visible';
+            } 
+            return 'hidden';
+          }
         },
         mounted() {
           if (localStorage.user) {
@@ -99,6 +125,13 @@
               }
               this.responseProps.freets = freets;
             },
+            followedHandler(authors) {
+              this.followed = authors;
+            },
+            followedUpdateHandler(authors) {
+              this.followed = authors;
+              this.follow = !this.follow;
+            }
         }
     } 
 </script>
@@ -110,14 +143,18 @@
   -moz-osx-font-smoothing: grayscale;
   /* text-align: center; */
   color: #2c3e50;
+  --std-color: #2c3e50;
   --darkblue:  #3973ac;
   --blue:      #6699cc;
   --lightblue: #9fbfdf;
   --stdheight: 34px;
+  display: flex;
+  flex-direction: column;
 }
 
 input {
   border: none;
+  border-radius: 4px;
   height: var(--stdheight);
 }
 
@@ -129,13 +166,19 @@ input[type="button"] {
   font-weight: bold;
 }
 
+
+input[type="button"]:hover {
+    cursor: pointer;
+    background-color: var(--blue);
+}
+
 input[type="button"]:focus {
   outline: none;
 }
 
 .topbar {
   display: inline-flex;
-  width: 100%;
+  width: calc(100% - 10px);
   justify-content: space-between;
   background-color: lightgray;
   padding: 5px;
@@ -145,6 +188,17 @@ input[type="button"]:focus {
 h1 {
   margin-top: auto;
   margin-bottom: auto;
+}
+
+.main {
+  display: inline-flex;
+  width: 100%;
+  height: calc(100vh - 106px);
+}
+
+html, body, #app {
+  height: 100vh;
+  margin: 0px;
 }
 
 /* #nav {

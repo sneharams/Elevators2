@@ -1,14 +1,15 @@
 <template>
-    <span class=".freetOptions">
-        <label>Search Freets by Author</label>
-        <input class="search" type="text" v-model="searchText" />
-        <input type="button" value="Search" v-on:click="viewFreetsByAuthorHandler"/>
-        <input type="button" value="View All Freets" v-on:click="viewAllFreetsHandler"/>
-        <div class="create" :style="{visibility: isLoggedIn ? 'visible' : 'hidden'}">
-            <input type="button" value="Create Freet" v-on:click="createFreetFormHandler"/>
-            <div :style="{visibility: createFreetOpen ? 'visible' : 'hidden'}">
+    <span class="freetOptions">
+        <input class="allButton" type="button" value="View All Freets" v-on:click="viewAllFreetsHandler"/>
+        <div class="searchbox">
+            <input class="search" type="text" v-model="searchText" v-on:focus="searchHandler"/>
+            <input type="button" class="searchButton" value="Search" v-on:click="viewFreetsByAuthorHandler"/>
+        </div>
+        <div class="create" :style="{visibility: vis}">
+            <input class="createbutton" type="button" value="Create Freet" v-on:click="createFreetFormHandler"/>
+            <div :style="{visibility: formVis}">
                 <CreateFreetForm
-                    v-on:succes="success"
+                    v-on:success="success"
                     v-on:close="createFreetFormHandler"
                 />
             </div>
@@ -20,15 +21,26 @@
 <script>
     import CreateFreetForm from './CreateFreetForm.vue';
     export default {
-        props: ['isLoggedIn'],
+        name: 'FreetOptions',
+        props: ['isLoggedIn', 'vis'],
         components: {CreateFreetForm},
         data() {
             return {
-                searchText: '',
+                searchText: 'Search Freets by Author',
                 createFreetOpen: false,
             }
         },
+        computed: {
+            formVis: function() {
+                return this.createFreetOpen ? 'visible' : 'hidden';
+            }
+        },
         methods: {
+            searchHandler() {
+                if (this.searchText = 'Search Freets by Author') {
+                    this.searchText = '';
+                }
+            },
             createFreetFormHandler() {
                 this.createFreetOpen = !this.createFreetOpen;
             },
@@ -37,7 +49,7 @@
               viewAllFreets(fields, this.success, this.error);
             },
             viewFreetsByAuthorHandler() {
-              const fields = {author: '_'+this.searchText};
+              const fields = {author: this.searchText};
               viewFreetsByAuthor(fields, this.success, this.error);
             },
             success(obj) {
@@ -64,26 +76,59 @@
 </script>
 
 <style scoped>
-    label {
-        margin-top: auto;
-        margin-bottom: auto;
-    }
-    span {
+    .freetOptions {
         display: inline-flex;
         width: 100%;
-        height: 42px;
+        height: 34px;
         background-color: var(--lightblue) !important;
+        padding-top: 10px;
+        padding-bottom: 10px;
     }
 
-    input[type="text"] {
-        margin-top: 4px;
-        margin-bottom: 4px;
+    .freetOptions input:first-of-type {
+        margin-left: 10px !important;
+    }
+
+    .allButton {
+        width: 120px !important;
+    }
+
+    input {
+        margin-top: 0px !important;
+        margin-bottom: 0px !important;
+    }
+
+    .searchbox {
+        display: inline-flex;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    .search {
         padding-top: 0px;
         padding-bottom: 0px;
+        margin-left: 10px;
+        flex: 1;
+        max-width: 400px;
+        border-radius: 4px 0px 0px 4px;
         height: 34px !important;
     }
 
+    .searchButton {
+        border-radius: 0px 4px 4px 0px;
+        margin-left: 0px;
+    }
+
     .create {
-        width: 190px;
+        display: flex;
+        flex-direction: column;
+        width: 100px;
+        margin-right: 10px;
+    }
+
+    .createbutton {
+        width: 100px;
+        position: relative;
+        right: 10px !important;
     }
 </style>

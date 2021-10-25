@@ -48,52 +48,25 @@
 
 <style scoped>
 
-    input {
-        border: none;
-        height: 34px;
-    }
 
-    input[type="button"] {
-        background-color: var(--darkblue);
-        color: white;
-        padding: 10px;
-        margin: 4px;
-        font-weight: bold;
-    }
-
-    input[type="button"]:focus {
-        outline: none;
-    }
-
-    input[type="button"]:hover {
-        cursor: pointer;
-        background-color: var(--blue);
-    }
-
-    input[type="text"] {
-        width: 285px;
-        float: right;
-        padding-left: 10px;
-    }
 
     .form {
         display: flex;
         justify-content: flex-end;
     }
 
-    form {
-        --darkblue:  #3973ac;
-        --blue:      #6699cc;
-        --lightblue: #9fbfdf;
+    .box {
+        z-index: 20;
+        position: relative;
         font-weight: bold;
         color: White;
         background-color: var(--blue);
         width: 400px;
-        margin-right: -5px;
         padding-top: 5px;
+        right: 290px;
     }
 
-    form > * {
+    .box > * {
         margin-top: 10px;
         margin-left: 10px;
         width: 380px;
@@ -101,7 +74,7 @@
         justify-content: space-between;
     }
 
-    form > :last-child {
+    .box > :last-child {
         margin-top: 10px;
         margin-bottom: 10px;
     }

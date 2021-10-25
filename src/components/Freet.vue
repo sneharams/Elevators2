@@ -1,12 +1,13 @@
 <template>
     <li class="contentbox"> 
         <span class="header">    
-            <div class="author"><h4 class="tooltip">
-                <img class="icon" src="../assets/profile.png"/>
-                <!-- update to make it clickable link to see author freets/follow -->
-                {{ freet.author }}
-                <span class="tooltiptext tooltiptextauthor">Author</span>
-            </h4></div>
+            <div class="author">
+                <button v-bind:class="authorClass" v-on:click="followHandler">
+                    <img class="icon" src="../assets/profile.png"/>
+                    <!-- update to make it clickable link to see author freets/follow -->
+                    {{ freet.author }}
+                </button>
+            </div>
             <section class="end">
                 <div><h4 class="tooltip id">
                     <span class="tooltiptext tooltiptextid">ID</span>
@@ -55,6 +56,7 @@
                 {{ upvotes }}
             </h4>
             <input
+                class="voteButton"
                 type="button"
                 value="Upvote"
                 :style="{backgroundColor: upvoteColor}"
@@ -73,7 +75,7 @@
 <script>
     export default {
         name: 'Freet',
-        props: ['freet', 'user'],
+        props: ['freet', 'user', 'followed'],
         data() {
             return {
                 content: '',
@@ -83,6 +85,15 @@
                 optionsOpen: false,
                 upvotes: 0, // make property under freet
                 upvoteColor: '#3973ac'
+            }
+        },
+        computed: {
+            authorClass: function() {
+                console.log(this.followed);
+                if (this.followed.includes(this.freet.author)) {
+                    return 'followed';
+                }
+                return 'notFollowed';
             }
         },
         methods: {
@@ -116,6 +127,12 @@
                 }
                 deleteFreet(fields, this.deleted, this.error);
             },
+            followHandler() {
+                const fields = {
+                    author: this.freet.author
+                }
+                addAuthorToFollowed(fields, this.follow, this.error);
+            },
             upvoteHandler() {
                 // update to actually function outside of client screen
                 if (this.upvoteColor == '#3973ac') {
@@ -128,6 +145,10 @@
             },
             refreetHandler() {
                 // update to do something
+            },
+            follow(obj) {
+                this.error = '';
+                this.$emit('updateFollowed', obj);
             },
             edited(obj) {
                 this.error = '';
@@ -179,7 +200,29 @@
         padding-top: 4px !important;
     }
 
+    button {
+        background-color: transparent;
+        outline: none;
+        border: none;
+        font-weight: bold;
+        font-size: 16px;
+    }
 
+    .followed {
+        color: var(--darkblue);
+    }
+
+    .followed:hover {
+        color: var(--std-color);
+    }
+
+    .notFollowed {
+        color: var(--std-color)
+    }
+
+    .notFollowed:hover {
+        color: var(--darkblue);
+    }
 
     .id {
         margin-right: 5px;
@@ -204,6 +247,7 @@
         border-color: var(--darkblue);
         min-width: 14px;
         color: white;
+        border-radius: 4px 0px 0px 4px
     }
 
     textArea {
@@ -247,46 +291,20 @@ h4 {
   margin-top: 10px;
 }
 
+.voteButton {
+    border-radius: 0px 4px 4px 0px;
+}
+
 .contentbox {
   padding: 2%;
 }
 
-.scrollbox {
-  overflow-y: scroll;
-}
 
 /* for tooltips clarifying what text is author and what is ID */
 .tooltip {
   position: relative;
   display: inline-block;
   border-bottom: 1px dotted gray;
-}
-
-.tooltip .tooltiptextauthor {
-  background-color: gray;
-  font-size: 10px;
-  color: #fff;
-  text-align: center;
-  padding: 5px;
-  border-radius: 6px;
-  position: absolute;
-  visibility: hidden;
-  left: 100%;
-  margin-top: -2px;
-  margin-left: 5px;
-  opacity: 0;
-  transition: opacity 1s;
-}
-
-.tooltip .tooltiptextauthor::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: 100%;
-  margin-top: -4px;
-  border-width: 3px;
-  border-style: solid;
-  border-color: transparent gray transparent transparent;
 }
 
 .tooltip .tooltiptextid {
@@ -315,11 +333,6 @@ h4 {
   border-width: 3px;
   border-style: solid;
   border-color: transparent transparent transparent gray;
-}
-
-.tooltip:hover .tooltiptextauthor {
-  visibility: visible;
-  opacity: 1;
 }
 
 .tooltip:hover .tooltiptextid {

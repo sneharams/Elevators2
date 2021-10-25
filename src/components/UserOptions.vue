@@ -1,33 +1,34 @@
 <template>
     <section class="optionsSection">
-        <div class="options">
-            <img class="icon" :style="{visibility: user.length>0 ? 'visible' : 'hidden'}" src="../assets/profile.png" />
-            <div class="profile" :style="{borderWidth: user.length>0 ? '2px' : '0px'}"> {{ user }} </div>
-            <div>
-                <input 
-                    type="button" 
-                    :style="{backgroundColor: button1.color}" 
-                    v-on:click="clickHandler1" :value="isLoggedIn ? 'Sign Out' : 'Sign In'"
-                />
-                <div class="formconnector" :style="{visibility: button1.connector}"/>
+        <div class="userOptions">
+            <div class="profile" :style="{visibility: vis}">
+                <img class="icon" src="../assets/profile.png" />
+                <div class="name"> {{ user }} </div>
             </div>
-            <div>
+            <div v-bind:class="button1">
                 <input 
                     type="button" 
-                    class="button2"
-                    :style="{backgroundColor: button2.color}" 
-                    v-on:click="clickHandler2" :value="isLoggedIn ? 'Account Settings' : 'Create Account'"
+                    v-on:click="clickHandler1" 
+                    :value="button1Value"
                 />
-                <div class="formconnector" :style="{visibility: button2.connector}"/>
+                <div/>
+            </div>
+            <div v-bind:class="button2">
+                <input 
+                    type="button" 
+                    v-on:click="clickHandler2" 
+                    :value="button2Value"
+                />
+                <div/>
             </div>
         </div>
         <div class="form" :style="{visibility: form}">
             <component 
                 :is="dropdown"
+                ref="form"
                 v-on="{credentials: credentialsHandler,close: closeHandler,username: usernameHandler,password: passwordHandler, usernameForm: usernameFormHandler, passwordForm: passwordFormHandler, delete: deleteHandler}"
                 v-bind:message="message"
                 v-bind:username="username"
-                v-bind:password="password"
             ></component>
         </div>
     </section>
@@ -41,7 +42,7 @@
     import AccountSettings from './AccountSettings.vue';
     export default {
         name: 'UserOptions',
-        props: ['isLoggedIn'],
+        props: ['isLoggedIn', 'vis'],
         components: {
             CredentialsForm,
             UsernameForm,
@@ -50,42 +51,42 @@
         },
         data () {
             return {
-                button1: {
-                    color: '#3973ac', // --darkblue
-                    connector: 'hidden'
-                },
-                button2: {
-                    color: '#3973ac', // --darkblue
-                    connector: 'hidden'
-                },
+                button1: 'closedForm',
+                button2: 'closedForm',
                 form: 'hidden',
                 username: '',
                 user: '',
-                darkblue: '#3973ac',
-                blue: '#6699cc',
                 message: '',
-                dropdown: CredentialsForm
+                dropdown: CredentialsForm,
+            }
+        },
+        computed: {
+            button1Value: function() {
+                return this.isLoggedIn ? 'Sign Out' : 'Sign In';
+            },
+            button2Value: function() {
+                return this.isLoggedIn ? 'Account Settings' : 'Create Account';
             }
         },
         mounted () {
             if (localStorage.user) {
                 this.user = localStorage.user;
+                this.$emit("sessionHandler", true, null, this.user);
             }
         },
         methods: {
             clickHandler1() {
+                this.dropdown = CredentialsForm;
                 if (!this.isLoggedIn) {
-                    this.toggleButton1();
-                    if (this.form == 'hidden') {
-                        this.dropdown = CredentialsForm;
-                        this.form = 'visible';
+                    if (this.form == 'hidden' || this.button2 == 'openForm') {
+                    this.dropdown = CredentialsForm;
+                    this.$refs.form.closeHandler();
+                    this.form = 'visible';
+                    this.button1 = 'openForm';
+                    this.button2 = 'closedForm'
                     } else {
-                        if (this.button2.connector == 'visible') {
-                            this.dropdown = CredentialsForm;
-                            this.toggleButton2();
-                        } else {
-                            this.form = 'hidden';
-                        }
+                        this.$refs.form.closeHandler();
+                        this.button1 = 'closedForm';
                     }
                 } else {
                     const fields = {};
@@ -93,55 +94,27 @@
                 }
             },
             clickHandler2() {
-                this.toggleButton2();
                 if (!this.isLoggedIn) {
-                    if (this.form == 'hidden') {
-                        this.dropdown = CredentialsForm;
-                        this.form = 'visible';
-                    } else {
-                        if (this.button1.connector == 'visible') {
-                            this.dropdown = CredentialsForm;
-                            this.toggleButton1();
-                        } else {
-                            this.form = 'hidden';
-                        }
-                    }
+                    this.dropdown = CredentialsForm;
                 } else {
-                    if (this.form == 'hidden') {
-                        this.dropdown = AccountSettings;
-                        this.form = 'visible';
-                    } else {
-                        this.form = 'hidden';
-                    }
+                    this.dropdown = AccountSettings;
+                }
+                if (this.form == 'hidden' || this.button1 == 'openForm') {
+                    this.dropdown = CredentialsForm;
+                    this.$refs.form.closeHandler();
+                    this.form = 'visible';
+                    this.button2 = 'openForm';
+                    this.button1 = 'closedForm'
+                } else {
+                    this.$refs.form.closeHandler();
+                    this.button2 = 'closedForm';
                 }
             },
             closeHandler() {
                 this.form = 'hidden';
                 this.message = '';
-                this.username = '';
-                this.password = '';
-                this.button1.connector = 'hidden';
-                this.button2.connector = 'hidden';
-                this.button1.color = this.darkblue;
-                this.button2.color = this.darkblue;
-            },
-            toggleButton1() {
-                if(this.button1.connector == 'visible') {
-                    this.button1.connector = 'hidden';
-                    this.button1.color = this.darkblue;
-                } else {
-                    this.button1.connector = 'visible';
-                    this.button1.color = this.blue;
-                }
-            },
-            toggleButton2() {
-                if(this.button2.connector == 'visible') {
-                    this.button2.connector = 'hidden';
-                    this.button2.color = this.darkblue;
-                } else {
-                    this.button2.connector = 'visible';
-                    this.button2.color = this.blue;
-                }
+                this.button1 = 'closedForm';
+                this.button2 = 'closedForm';
             },
             usernameFormHandler() {
                 this.dropdown = UsernameForm;
@@ -155,8 +128,7 @@
             },
             credentialsHandler(fields) {
                 this.username = fields.username;
-                this.password = fields.password;
-                if (this.button1.connector == 'visible') {
+                if (this.button1 == 'openForm') {
                     signIn(fields, this.signedIn, this.error);
                 } else {
                     createUser(fields, this.created, this.error);
@@ -173,19 +145,20 @@
             },
             signedIn(obj) {
                 this.user = this.username;
+                console.log(this.user);
                 localStorage.user = this.user;
                 this.$emit("sessionHandler", true, obj.data, this.user);
-                this.closeHandler();
+                this.$refs.form.closeHandler();
             },
             signedOut(obj) {
                 this.user = '';
                 localStorage.user = this.user;
                 this.$emit("sessionHandler", false, obj.data, this.user);
-                this.closeHandler();
+                this.$refs.form.closeHandler();
             },
             created(obj) {
                 this.$emit("sessionHandler", false, obj.data, this.user);
-                this.closeHandler();
+                this.$refs.form.closeHandler();
             },
             // error to be displayed in main response area
             sessionError(obj) {
@@ -241,39 +214,52 @@
 
 <style scoped>
 
-    .optionsSection {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    
-
-    input[type="button"]:hover {
-        cursor: pointer;
+    .openForm input {
+        border-radius: 4px 4px 0px 0px;
         background-color: var(--blue);
     }
 
-    .options {
-        display: flex;
-        justify-content: flex-end;
-    }
-
-    .form {
-        display: flex;
-        justify-content: flex-end;
-    }
-
-    .button2 {
-        width: 130px;
-    }
-
-    .formconnector {
+    .openForm div {
         background-color: var(--blue);
         color: var(--blue);
         margin-left: 4px;
         margin-right: 4px;
         margin-top: -4px;
         height: 9px;
+    }
+
+    .closedForm input {
+        border-radius: 4px 4px 4px 4px;
+        background-color: var(--darkblue);
+    }
+
+    .closedForm div {
+        visibility: 'hidden';
+    }
+
+    .optionsSection {
+        display: flex;
+        flex-direction: column;
+    }
+
+    input[type="button"]:hover {
+        cursor: pointer;
+        background-color: var(--blue) !important;
+    }
+
+    .userOptions {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .form {
+        margin-top: -4px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .button2 {
+        width: 130px;
     }
 
     .formbutton {
@@ -290,12 +276,18 @@
     }
 
     .profile {
+        display: inline-flex;
+    }
+
+    .name {
         margin-top: auto;
         margin-bottom: auto;
         margin-right: 5px;
         font-weight: bold;
         font-size: 20px;
         border-right: solid;
+        border-width: 2px;
+        border-color: gray;
         padding-right: 5px;
         padding-bottom: 1px;
     }

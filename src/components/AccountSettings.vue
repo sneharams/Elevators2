@@ -1,5 +1,5 @@
 <template>
-    <form>
+    <form class="accountOptions">
         <input type="button" v-on:click="usernameHandler" value="Change Username"/>
         <input type="button" v-on:click="passwordHandler" value="Change Password"/>
         <input type="button" v-on:click="deleteHandler" value="Delete Account"/>
@@ -34,14 +34,6 @@
         height: 34px;
     }
 
-    input[type="button"] {
-        background-color: var(--darkblue);
-        color: white;
-        padding: 10px;
-        margin: 4px;
-        font-weight: bold;
-    }
-
     input[type="button"]:focus {
         outline: none;
     }
@@ -51,10 +43,11 @@
         background-color: var(--lightblue);
     }
 
-    form {
-        --darkblue:  #3973ac;
-        --blue:      #6699cc;
-        --lightblue: #9fbfdf;
+    .accountOptions {
+        display: flex;
+        flex-direction: column;
+        z-index: 20;
+        position: relative;
         font-weight: bold;
         color: White;
         background-color: var(--blue);
@@ -63,13 +56,13 @@
         padding-top: 5px;
     }
 
-    form > * {
+    .accountOptions > * {
         margin-top: 10px;
         margin-left: 10px !important;
         width: 140px;
     }
 
-    form > :last-child {
+    .accountOptions > :last-child {
         width: 34px;
         margin-bottom: 10px;
         margin-left: 63px !important;

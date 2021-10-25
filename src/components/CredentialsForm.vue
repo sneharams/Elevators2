@@ -21,9 +21,17 @@
 <script>
     export default {
         name: 'CredentialsForm',
-        props: ['message', 'username', 'password'],
+        props: ['message'],
+        data() {
+            return {
+                username: '',
+                password: ''
+            }
+        },
         methods: {
             closeHandler() {
+                this.username = '';
+                this.password = '';
                 this.$emit("close");
             },
             submitHandler() {
@@ -73,9 +81,8 @@
     }
 
     form {
-        --darkblue:  #3973ac;
-        --blue:      #6699cc;
-        --lightblue: #9fbfdf;
+        z-index: 20;
+        position: relative;
         font-weight: bold;
         color: White;
         background-color: var(--blue);

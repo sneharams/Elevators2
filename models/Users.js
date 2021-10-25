@@ -6,6 +6,8 @@ let id_num = 0;
  * @prop {string} user_id  - user_id for account
  * @prop {string} username - username for account
  * @prop {string} password - password for account
+ * @prop {array} following - users that account follows
+
  */
 
 /**
@@ -25,7 +27,13 @@ class Users {
      */
     static addUser(username, password) {
         const user_id = id_num.toString();
-        const user = {user_id, username, password};
+        const following = [];
+        const user = {
+            user_id, 
+            username, 
+            password,
+            following
+        };
         id_num += 1;
         users.push(user);
         return user;
@@ -87,6 +95,31 @@ class Users {
         return user;
     }
 
+    /**
+     * Add an authors to user's following array.
+     * 
+     * @param   {string} user_id       - the user_id of the user account
+     * @param   {string} author_name   - the username of the author to follow
+     * @return  {string[]} - an updated array of usernames of followed authors
+     */
+    static addAuthorToFollowed(user_id, author_name) {
+        const author = Users.findUser(author_name);
+        const user = Users.findUserByID(user_id);
+        user.following.push(author);
+        return Users.getUserFollowed(user_id);
+    }
+
+    /**
+     * Get an array of the authors the user is following.
+     * 
+     * @param   {string} user_id       - the user_id of the user account
+     * @return  {string[]} - an array of usernames of followed authors
+     */
+    static getUserFollowed(user_id) {
+        const user = Users.findUserByID(user_id);
+        const followingNames = user.following.map(author => author.username);
+        return followingNames;
+    }
 }
 
 module.exports = Users;

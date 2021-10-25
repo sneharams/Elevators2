@@ -23,7 +23,7 @@ router.get('/', (req, res) => {
 /**
  * List all freets by author.
  * 
- * @id GET api/freets/:author
+ * @id GET api/freets/author/:author
  * 
  * @param  {string} author - username of author
  * @return {Freets[]} - list of all stored freets by author
@@ -31,16 +31,39 @@ router.get('/', (req, res) => {
  * @throws {400} - if no author inputed
  */
 router.get(
-    '/:author?', 
+    '/author/:author?', 
     [
         validateThat.authorInputted,
         validateThat.authorExists
     ],
     (req, res) => {
-        const author = req.params.author.substring(1);
+        const author = req.params.author;
         const msg = {
             msg: `Freets by author: ${author}`,
             freets: Freets.findAllByAuthor(author)
+        }
+        res.status(200).json(msg).end();
+});
+
+/**
+ * List all freets by authors that the user follows.
+ * 
+ * @id GET api/freets/followed
+ * 
+ * @return {Freets[]} - list of all freets by followed authors
+ * @throws {403} - if the user isn't logged in
+ */
+ router.get(
+    '/followed', 
+    [
+        validateThat.userIsLoggedIn,
+    ],
+    (req, res) => {
+        const followed = Users.getUserFollowed(req.session.user_id);
+        const freets = Freets.findAll().filter(freet => followed.includes(freet.author));
+        const msg = {
+            msg: `Freets by followed authors.`,
+            freets: freets
         }
         res.status(200).json(msg).end();
 });
@@ -51,7 +74,7 @@ router.get(
  * @id POST api/freets
  * 
  * @param  {string} content - content freet contains
- * @return {Freet} - the created freet
+ * @return {Freets[]} - the created freet in an array
  * @throws {403} - if the user isn't logged in
  */
 router.post(
@@ -76,7 +99,7 @@ router.post(
  * @id PUT api/freets/:id
  * 
  * @param  {string} content - the new content to point to
- * @return {Freet} - the updated freet
+ * @return {Freets[]} - the updated freet in an array
  * @throws {403} - if the user isn't logged in or if the freet isn't authored by the logged in user
  * @throws {404} - if the freet does not exist
  */
@@ -102,7 +125,7 @@ router.put(
  * 
  * @id DELETE api/freets/:id
  * 
- * @return {Freet} - the deleted freet
+ * @return {Freets[]} - the deleted freet in an array
  * @throws {403} - if the user isn't logged in or if the freet isn't authored by the logged in user
  * @throws {404} - if the freet does not exist
  */

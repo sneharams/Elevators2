@@ -120,13 +120,60 @@ router.put(
 router.delete(
     '/session', 
     [
-        validateThat.userIsLoggedIn,
+        validateThat.userIsLoggedIn
     ],
     (req, res) => {
         req.session.user_id = null;
         let msg = "You are now signed out.";
         res.status(200).json(msg);
 });
+
+
+/**
+ * Gets an array of usernames of authors that the user follows.
+ * 
+ * @id GET api/users/followed
+ * 
+ * @return  {string[]} - an array of usernames of authors
+ * @throws  {403} - if the user isn't logged in
+ */
+router.get(
+    '/followed',
+    [
+        validateThat.userIsLoggedIn
+    ],
+    (req, res) => {
+        let followed = Users.getUserFollowed(req.session.user_id);
+        let msg = {
+            msg: "Here are who you follow.",
+            followed: followed
+        };
+        res.status(200).json(msg);
+    }
+)
+
+/**
+ * Adds an author to user's followed.
+ * 
+ * @id PUT api/users/followed
+ * 
+ * @return  {string[]} - an array of usernames of authors
+ * @throws  {403} - if the user isn't logged in
+ */
+router.put(
+    '/followed/:author?',
+    [
+        validateThat.userIsLoggedIn,
+    ],
+    (req, res) => {
+        let followed = Users.addAuthorToFollowed(req.session.user_id, req.body.author);
+        let msg = {
+            msg: "Here is an updated array of who you follow.",
+            followed: followed
+        };
+        res.status(200).json(msg);
+    }
+)
 
 
 /**

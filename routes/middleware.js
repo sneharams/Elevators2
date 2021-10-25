@@ -102,7 +102,7 @@ const userIsLoggedOut = (req, res, next) => {
 
 // Checks that the username of author exists
 const authorExists = (req, res, next) => {
-    let author = req.params.author.substring(1); // remove leading '_'
+    let author = req.params.author; // remove leading '_'
     const user = Users.findUser(author);
     if (!user) {
         res.status(404).json({
@@ -116,7 +116,7 @@ const authorExists = (req, res, next) => {
 // Checks that an author is inputted
 const authorInputted = (req, res, next) => {
     // '_' before every search request, so only '_' means empty search
-    if (req.params.author == '_') {
+    if (req.params.author == undefined) {
         res.status(400).json({
             error: `No author name inputted.`,
         }).end();
