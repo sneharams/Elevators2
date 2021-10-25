@@ -12,7 +12,7 @@
     </form>
 </template>
 
-<script src="../javascripts/services.js"></script>
+<script src="../../public/services.js"></script>
 <script>
     export default {
         name: 'CreateFreetForm',
