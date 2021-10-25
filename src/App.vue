@@ -20,9 +20,9 @@
           v-bind:isLoggedIn="isLoggedIn"
           v-bind:vis="vis"
           v-bind:user="user"
+          v-bind:authors="followed"
           v-on:freetHandler="freetHandler"
           v-on:errorHandler="errorHandler"
-          v-on:followed="followedHandler"
         />
         <Response 
           v-bind:response="responseProps" 
@@ -72,6 +72,18 @@ import Following from './components/Following.vue';
           if (localStorage.responseProps) {
             this.responseProps = localStorage.responseProps;
           }
+        },
+        watch: {
+            isLoggedIn: function() {
+                if (this.isLoggedIn) {
+                    // get followed authors
+                    const fields = {};
+                    getFollowedAuthors(fields, this.followingSuccess, this.error);
+                } else {
+                    this.authors = [];
+                    this.$emit('followed', this.authors);
+                }
+            }
         },
         methods: {
             sessionHandler(status, message, user) {
@@ -128,9 +140,12 @@ import Following from './components/Following.vue';
             followedHandler(authors) {
               this.followed = authors;
             },
-            followedUpdateHandler(authors) {
-              this.followed = authors;
-              this.follow = !this.follow;
+            followingSuccess(obj) {
+                this.followed = obj.data.followed;
+            },
+            error(obj) {
+              const message = ["Error",obj.status,obj.statusText,"-",obj.data.error].join(' ');
+              this.errorHandler(message);
             }
         }
     } 

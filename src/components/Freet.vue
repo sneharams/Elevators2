@@ -2,10 +2,11 @@
     <li class="contentbox"> 
         <span class="header">    
             <div class="author">
-                <button v-bind:class="authorClass" v-on:click="followHandler">
+                <button v-bind:class="authorClass" class="tooltip" v-on:click="followHandler">
                     <img class="icon" src="../assets/profile.png"/>
                     <!-- update to make it clickable link to see author freets/follow -->
                     {{ freet.author }}
+                    <span class="tooltiptext tooltiptextauthor"> {{ isFollowing }}</span>
                 </button>
             </div>
             <section class="end">
@@ -13,14 +14,14 @@
                     <span class="tooltiptext tooltiptextid">ID</span>
                     {{ freet.id }}
                 </h4></div>
-                <div class="options" :style="{visibility: user==freet.author ? 'visible' : 'hidden'}">
+                <div class="options" :style="{visibility: isAuthor}">
                     <input 
                         class="optionsButton"
                         type="button" 
                         value=":" 
                         v-on:click="optionsHandler"
                     />
-                    <div class="optionItems" :style="{visibility: optionsOpen ? 'visible' : 'hidden'}">
+                    <div class="optionItems" :style="{visibility: optionsVis}">
                         <!-- todo: create tooltip for why disabled -->
                         <input 
                             :disabled="edit ? true : false"
@@ -38,8 +39,8 @@
             </section>
         </span>
         <div class="content">{{ freet.content }}</div>
-        <div class="error" :style="{visibility: message.length>0 ? 'visible' : 'hidden'}">{{message}}</div>
-        <div class="editor" :style="{visibility: isEditing ? 'visible' : 'hidden', height: isEditing ? '150px' : '0px'}">
+        <div class="error" :style="{visibility: errorVis}">{{message}}</div>
+        <div class="editor" :style="{visibility: editorVis, height: editorHeight}">
             <section class="editHeader">
             <label>Edit Content</label>
                 <div class="editOptions">
@@ -84,17 +85,45 @@
                 message: '', // holds error
                 optionsOpen: false,
                 upvotes: 0, // make property under freet
-                upvoteColor: '#3973ac'
+                upvoteColor: '#3973ac',
+                authorClass: 'notFollowed',
+                isFollowing: 'Not Following',
+                editorVis: 'hidden',
+                editorHeight: '0px'
+            }
+        },
+        watch: {
+            followed: function() {
+                console.log(this.followed);
+                if (this.followed.includes(this.freet.author)) {
+                    this.authorClass= 'followed';
+                    this.isFollowing='Following';
+                } else {
+                    this.authorClass= 'notFollowed';
+                    this.isFollowing='Not Following';
+                }
+            },
+            isEditing: function() {
+                if (this.isEditing) {
+                    this.editorVis = 'visible';
+                    this.editorHeight = '150px';
+                } else {
+                    this.editorVis = 'hidden';
+                    this.editorHeight = '0px';
+                }
             }
         },
         computed: {
-            authorClass: function() {
-                console.log(this.followed);
-                if (this.followed.includes(this.freet.author)) {
-                    return 'followed';
-                }
-                return 'notFollowed';
+            isAuthor: function() {
+                return this.user==this.freet.author ? 'visible' : 'hidden'
+            },
+            optionsVis: function() {
+                return this.optionsOpen ? 'visible' : 'hidden';
+            },
+            errorVis: function() {
+                return this.message.length>0 ? 'visible' : 'hidden'
             }
+
         },
         methods: {
             optionsHandler() {
@@ -271,6 +300,7 @@
     }
     
 .author {
+  display: inline-flex;
   float: left;
   flex-grow: 1;
   height: 20px;
@@ -324,6 +354,23 @@ h4 {
   transition: opacity 1s;
 }
 
+.tooltip .tooltiptextauthor {
+  background-color: gray;
+  font-size: 10px;
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+  position: absolute;
+  visibility: hidden;
+  left: 100%;
+  top: 10%;
+  margin-top: -2px;
+  margin-left: 5px;
+  opacity: 0;
+  transition: opacity 1s;
+}
+
 .tooltip .tooltiptextid::after {
   content: "";
   position: absolute;
@@ -335,7 +382,23 @@ h4 {
   border-color: transparent transparent transparent gray;
 }
 
+.tooltip .tooltiptextauthor::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  margin-top: -4px;
+  border-width: 3px;
+  border-style: solid;
+  border-color: transparent gray transparent transparent;
+}
+
 .tooltip:hover .tooltiptextid {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tooltip:hover .tooltiptextauthor {
   visibility: visible;
   opacity: 1;
 }

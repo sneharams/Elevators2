@@ -1,3 +1,12 @@
+// DIDN'T USE
+// Show an object on the screen.
+// function showObject(obj) {
+//   const pre = document.getElementById('response');
+//   const preParent = pre.parentElement;
+//   pre.innerText = JSON.stringify(obj, null, 4);
+//   preParent.classList.add('flashing');
+//   setTimeout(() => preParent.classList.remove('flashing'), 300);
+// }
 
 // Axios responses have a lot of data. This shows only the most relevant data.
 function showResponse(axiosResponse, callback) {
@@ -48,6 +57,18 @@ function changePassword(fields, callbackSuccess, callbackFailure) {
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
 
+function addAuthorToFollowed(fields, callbackSuccess, callbackFailure) {
+  axios.put('/api/users/followed', fields)
+    .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
+    .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
+}
+
+function getFollowedAuthors(fields, callbackSuccess, callbackFailure) {
+  axios.get('/api/users/followed', fields)
+    .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
+    .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
+}
+
 function deleteUser(fields, callbackSuccess, callbackFailure) {
   axios.delete('/api/users', fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
@@ -72,9 +93,14 @@ function viewAllFreets(fields, callbackSuccess, callbackFailure) {
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
 
-// author needs to be searched with leading '_' (ex: '_user') if called directly from url bar
 function viewFreetsByAuthor(fields, callbackSuccess, callbackFailure) {
-  axios.get('/api/freets/'+ fields.author, fields)
+  axios.get('/api/freets/author/'+ fields.author, fields)
+    .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
+    .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
+}
+
+function viewFreetsByFollowedAuthors(fields, callbackSuccess, callbackFailure) {
+  axios.get('/api/freets/followed', fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
@@ -96,6 +122,7 @@ function deleteFreet(fields, callbackSuccess, callbackFailure) {
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
+
 
 // Map form (by id) to the function that should be called on submit
 // const formsAndHandlers = {

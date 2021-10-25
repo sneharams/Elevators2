@@ -19,27 +19,15 @@
     import AuthorButton from './AuthorButton.vue';
     export default {
         name: 'Following',
-        props: ['isLoggedIn', 'vis', 'user'],
+        props: ['isLoggedIn', 'vis', 'user', 'authors'],
         components: {AuthorButton},
         data() {
             return {
-                authors: [],
                 freets: [],
                 message: 'Sign in to view freets from authors you follow!',
             }
         },
-        watch: {
-            isLoggedIn: function() {
-                if (this.isLoggedIn) {
-                    // get followed authors
-                    const fields = {};
-                    getFollowedAuthors(fields, this.followingSuccess, this.error);
-                } else {
-                    this.authors = [];
-                    this.$emit('followed', this.authors);
-                }
-            }
-        },
+
         methods: {
             authorHandler(author) {
                 const authorText = author;
@@ -66,10 +54,6 @@
               // sort freets by id (greatest -> smallest), so most recent freets displayed first
               freets.sort((a, b) => (parseInt(a.id) < parseInt(b.id)) ? 1 : -1);
               this.$emit('freetHandler', obj.data.msg, freets);
-            },
-            followingSuccess(obj) {
-                this.authors = obj.data.followed;
-                this.$emit('followed', this.authors);
             },
             error(obj) {
               const message = ["Error",obj.status,obj.statusText,"-",obj.data.error].join(' ');
