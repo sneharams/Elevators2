@@ -59,7 +59,7 @@ function changePassword(fields, callbackSuccess, callbackFailure) {
 }
 
 function addAuthorToFollowed(fields, callbackSuccess, callbackFailure) {
-  axios.put('/api/users/followed', fields)
+  axios.put('/api/users/followed/' + fields.author, fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
@@ -106,6 +106,12 @@ function viewFreetsByAuthor(fields, callbackSuccess, callbackFailure) {
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
 
+function viewFreetByID(fields, callbackSuccess, callbackFailure) {
+  axios.get('/api/freets/id/'+ fields.id, fields)
+    .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
+    .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
+}
+
 function viewFreetsByFollowedAuthors(fields, callbackSuccess, callbackFailure) {
   axios.get('/api/freets/followed', fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
@@ -119,19 +125,19 @@ function createFreet(fields, callbackSuccess, callbackFailure) {
 }
 
 function refreetFreet(fields, callbackSuccess, callbackFailure) {
-  axios.post('/api/freets/' + fields.parent_id, fields)
+  axios.post('/api/freets/id/' + fields.parent_id, fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
 
 function editFreet(fields, callbackSuccess, callbackFailure) {
-  axios.put('/api/freets/' + fields.id, fields)
+  axios.put('/api/freets/id/' + fields.id, fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
 
 function deleteFreet(fields, callbackSuccess, callbackFailure) {
-  axios.delete('/api/freets/' + fields.id, fields)
+  axios.delete('/api/freets/id/' + fields.id, fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }

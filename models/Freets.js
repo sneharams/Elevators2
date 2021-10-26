@@ -13,7 +13,7 @@ let id_num = 0;
  * @prop {string} id      - id of the freet
  * @prop {string} content - the content of the freet
  * @prop {string} author  - username of the author
- * @prop {freet} parent - parent freet (None if original freet)
+ * @prop {Freet} parentFreet - parent freet (null if original freet)
  * @prop {int} upvotes - number of upvotes of freet >=0 
  */
 
@@ -36,9 +36,9 @@ class Freets {
   static addOne(content, author, user_id) {
     const id = id_num.toString();
     const freet = {id, content, author};
-    const parent = None;
+    const parentFreet = null;
     const upvotes = 0;
-    const freet_obj = {id, user_id, freet, parent,upvotes};
+    const freet_obj = {id, user_id, freet, parentFreet,upvotes};
     id_num = id_num + 1;
     data.push(freet_obj);
     return freet_obj.freet;
@@ -163,8 +163,8 @@ class Freets {
   static refreet(content, author, user_id, parent_id) {
     const id = id_num.toString();
     const upvotes = 0; 
-    const parent = Freets.findOne(parent_id); 
-    const freet = {id, content, author, parent, upvotes};
+    const parentFreet = Freets.findOne(parent_id); 
+    const freet = {id, content, author, parentFreet, upvotes};
     const freet_obj = {id, user_id, freet}; 
     id_num = id_num + 1; 
     data.push(freet_obj);

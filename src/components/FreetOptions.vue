@@ -47,29 +47,20 @@
             viewAllFreetsHandler() {
               const fields = {};
               viewAllFreets(fields, this.success, this.error);
+              localStorage.lastCall = "all";
             },
             viewFreetsByAuthorHandler() {
               const fields = {author: this.searchText};
               viewFreetsByAuthor(fields, this.success, this.error);
+              localStorage.lastCall = "author";
+              localStorage.author = this.searchText;
             },
             success(obj) {
-              console.log('freet options hi');
-              let freets = [];
-              // create properties for each freet
-              for (let [key, value] of Object.entries(obj.data.freets)) {
-                  freets.push({
-                      id: value.id,
-                      content: value.content,
-                      author: value.author
-                  });
-              };
-              // sort freets by id (greatest -> smallest), so most recent freets displayed first
-              freets.sort((a, b) => (parseInt(a.id) < parseInt(b.id)) ? 1 : -1);
-              this.$emit('freetHandler', obj.data.msg, freets);
+                this.$emit('success', obj);
             },
             error(obj) {
-              const message = ["Error",obj.status,obj.statusText,"-",obj.data.error].join(' ');
-              this.$emit('errorHandler', message);
+              localStorage.lastCall = 'home';
+              this.$emit('error', obj);
             }
         }
     }
@@ -80,7 +71,7 @@
         display: inline-flex;
         width: 100%;
         height: 34px;
-        background-color: var(--lightblue) !important;
+        background-color: var(--darkblue);
         padding-top: 10px;
         padding-bottom: 10px;
     }
@@ -90,7 +81,7 @@
     }
 
     .allButton {
-        width: 120px !important;
+        width: 140px !important;
     }
 
     input {
@@ -107,6 +98,7 @@
     .search {
         padding-top: 0px;
         padding-bottom: 0px;
+        padding-left: 5px;
         margin-left: 10px;
         flex: 1;
         max-width: 400px;

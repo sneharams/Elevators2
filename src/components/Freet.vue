@@ -39,10 +39,13 @@
             </section>
         </span>
         <div class="content">{{ freet.content }}</div>
+        <button v-bind:class="parentClass" v-on:click="parentHandler">
+            {{ parent.author }}-{{ parent.id }}
+        </button>
         <div class="error" :style="{visibility: errorVis}">{{message}}</div>
         <div class="editor" :style="{visibility: editorVis, height: editorHeight}">
             <section class="editHeader">
-            <label>Edit Content</label>
+            <label> {{ inputTitle }}</label>
                 <div class="editOptions">
                     <input type="button" value="Cancel" v-on:click="cancelHandler"/>
                     <input type="button" value="Update" v-on:click="updateHandler"/>
@@ -89,7 +92,8 @@
                 authorClass: 'notFollowed',
                 isFollowing: 'Not Following',
                 editorVis: 'hidden',
-                editorHeight: '0px'
+                editorHeight: '0px',
+                inputTitle: 'Edit Content'
             }
         },
         watch: {
@@ -122,6 +126,19 @@
             },
             errorVis: function() {
                 return this.message.length>0 ? 'visible' : 'hidden'
+            },
+            parent: function() {
+                if (this.freet.parentFreet) {
+                    return this.freet.parentFreet;
+                } else {
+                    return {
+                        id: '',
+                        author: ''
+                    };
+                }
+            },
+            parentClass: function() {
+                return this.freet.parentFreet ? 'visParent' : 'hidParent';
             }
         },
         mounted() {
@@ -168,12 +185,11 @@
                 const fields = {
                     author: this.freet.author
                 }
-                if (this.isFollowing) {
+                if (this.isFollowing == "Following") {
                     removeAuthorFromFollowed(fields, this.follow, this.error);
                 } else {
                     addAuthorToFollowed(fields, this.follow, this.error);
                 }
-                
             },
             upvoteHandler() {
                 // update to actually function outside of client screen
@@ -186,7 +202,17 @@
                 }
             },
             refreetHandler() {
-                
+                const fields = {
+                    parent_id: this.freet.id,
+                    content: ''
+                };
+                refreetFreet(fields, this.freetSuccess, this.error);
+            },
+            parentHandler() {
+                const fields = {
+                    id: this.freet.parentFreet.id
+                };
+                viewFreetByID(fields, this.freetSuccess, this.error);
             },
             follow(obj) {
                 this.error = '';
@@ -204,6 +230,11 @@
             },
             error(obj) {
                 this.message = obj.data.error;
+            },
+            freetSuccess(obj) {
+                const message = obj.data.msg;
+                const freets = obj.data.freets;
+                this.$emit('success', message, freets);
             }
         }
     }
@@ -237,7 +268,6 @@
         margin: 0px !important;
         position: relative;
         top: -4px;
-        /* margin-bottom: 10px !important; */
         border-radius: 15px;
         padding-top: 4px !important;
     }
@@ -248,6 +278,16 @@
         border: none;
         font-weight: bold;
         font-size: 16px;
+    }
+
+    .visParent {
+        visibility: 'visible';
+        height: 20px;
+    }
+
+    .hidParent {
+        visibility: 'hidden';
+        height: 0px;
     }
 
     .followed {
@@ -282,9 +322,9 @@
         text-align: center;
         padding-left: 10px;
         padding-right: 10px;
-        margin-top: 4px;
+        margin-top: 6px;
         padding-top: 8px;
-        margin-right: -4px;
+        margin-right: -6px;
         border-right: solid;
         border-color: var(--darkblue);
         min-width: 14px;
@@ -336,10 +376,14 @@ h4 {
 
 .voteButton {
     border-radius: 0px 4px 4px 0px;
+    margin-left: 0px;
 }
 
 .contentbox {
-  padding: 2%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 2%;
+    max-width: 800px;
 }
 
 
@@ -421,80 +465,80 @@ h4 {
 }
 
 
-    input {
-        border: none;
-        height: 34px;
-    }
+input {
+    border: none;
+    height: 34px;
+}
 
-    input[type="button"] {
-        background-color: var(--darkblue);
-        color: white;
-        padding: 10px;
-        margin: 4px;
-        font-weight: bold;
-    }
+input[type="button"] {
+    background-color: var(--darkblue);
+    color: white;
+    padding: 10px;
+    margin: 4px;
+    font-weight: bold;
+}
 
-    input[type="button"]:focus {
-        outline: none;
-    }
+input[type="button"]:focus {
+    outline: none;
+}
 
-    input[type="button"]:hover {
-        cursor: pointer;
-        background-color: var(--blue);
-    }
+input[type="button"]:hover {
+    cursor: pointer;
+    background-color: var(--blue);
+}
 
-    input[type="button"]:disabled {
-        background-color: gray;
-    }
+input[type="button"]:disabled {
+    background-color: gray;
+}
 
-    input[type="text"] {
-        width: 285px;
-        float: right;
-        padding-left: 10px;
-    }
+input[type="text"] {
+    width: 285px;
+    float: right;
+    padding-left: 10px;
+}
 
-    header {
-        height: 30px;
-    }
+header {
+    height: 30px;
+}
 
-    img {
-        height: 16px;
-        width: 16px;
-    }
+img {
+    height: 16px;
+    width: 16px;
+}
 
-    form > * {
-        margin-top: 10px;
-        margin-left: 10px;
-        width: 380px;
-        display: inline-flex;
-        justify-content: space-between;
-    }
+form > * {
+    margin-top: 10px;
+    margin-left: 10px;
+    width: 380px;
+    display: inline-flex;
+    justify-content: space-between;
+}
 
-    form > :last-child {
-        margin-bottom: 10px;
-    }
+form > :last-child {
+    margin-bottom: 10px;
+}
 
-    label {
-        margin-top: auto;
-        margin-bottom: auto;
-    }
+label {
+    margin-top: auto;
+    margin-bottom: auto;
+}
 
-    .formbutton {
-        margin: 0px !important;
-    }
+.formbutton {
+    margin: 0px !important;
+}
 
-    .formbutton:hover {
-        background-color: var(--lightblue) !important;
-    }
+.formbutton:hover {
+    background-color: var(--lightblue) !important;
+}
 
-    .close {
-        width: 34px;
-        margin-right: 10px !important;
-        padding-top: 4px !important;
-        padding-bottom: 5px !important;
-    }
+.close {
+    width: 34px;
+    margin-right: 10px !important;
+    padding-top: 4px !important;
+    padding-bottom: 5px !important;
+}
 
-    .submit {
-        width: 346px;
-    }
+.submit {
+    width: 346px;
+}
 </style>

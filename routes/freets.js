@@ -96,7 +96,7 @@ router.post(
 /**
  * Update a freet.
  * 
- * @id PUT api/freets/:id
+ * @id PUT api/freets/id/:id
  * 
  * @param  {string} content - the new content to point to
  * @return {Freets[]} - the updated freet in an array
@@ -104,7 +104,7 @@ router.post(
  * @throws {404} - if the freet does not exist
  */
 router.put(
-    '/:id?', 
+    '/id/:id?', 
     [
         validateThat.userIsLoggedIn,
         validateThat.freetExists,
@@ -123,14 +123,14 @@ router.put(
 /**
  * Delete a freet.
  * 
- * @id DELETE api/freets/:id
+ * @id DELETE api/freets/id/:id
  * 
  * @return {Freets[]} - the deleted freet in an array
  * @throws {403} - if the user isn't logged in or if the freet isn't authored by the logged in user
  * @throws {404} - if the freet does not exist
  */
 router.delete(
-    '/:id?', 
+    '/id/:id?', 
     [
         validateThat.userIsLoggedIn,
         validateThat.freetExists,
@@ -146,9 +146,34 @@ router.delete(
 });   
 
 /**
+ * Find a freet.
+ * 
+ * @id Get api/freets/id/:id
+ * 
+ * @return {Freets[]} - the deleted freet in an array
+ * @throws {403} - if the user isn't logged in or if the freet isn't authored by the logged in user
+ * @throws {404} - if the freet does not exist
+ */
+router.get(
+    '/id/:id?',
+    [
+        validateThat.userIsLoggedIn,
+        validateThat.freetExists,
+        validateThat.freetIsByUser
+    ],
+    (req, res) => {
+        const freet = Freets.findOne(req.params.id);
+        const msg = {
+            msg: `Freet with ID: ${req.params.id}.`,
+            freets: [freet]
+        }
+        res.status(200).json(msg).end();
+});   
+
+/**
  * Refreet a freet.
  * 
- * @id POST api/freets
+ * @id POST api/freets/id/:parent_id
  * 
  * @param  {string} content - content freet contains
  * @param  {string} parent_id - id of the freet user is refreeting 
@@ -156,11 +181,11 @@ router.delete(
  * @throws {403} - if the user isn't logged in
  */ 
  router.post( 
-    '/:parent_id?', 
+    '/id/:parent_id?', 
     [
         validateThat.userIsLoggedIn,
         validateThat.freetTextIsWithinLimit,
-        // can't refreet own freet, if parent gets deleted then (in freet say deleted)
+        validateThat.freetExists
     ], 
     (req, res) => {
         const creator = Users.findUserByID(req.session.user_id).username;

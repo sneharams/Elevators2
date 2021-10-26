@@ -65,6 +65,8 @@
 
 <style scoped>
     nav {
+        border-top: solid;
+        border-color: var(--blue);
         width: 140px;
         padding: 10px;
         background-color: var(--darkblue);

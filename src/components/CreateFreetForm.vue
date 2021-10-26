@@ -29,7 +29,6 @@
                 this.message = '';
             },
             submitHandler() {
-                console.log('submit');
                 const fields = {
                     content: this.content
                 };

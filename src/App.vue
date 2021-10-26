@@ -1,18 +1,19 @@
 <template>
     <main id="app">
       <header class="topbar">
-        <h1>Fritter</h1>
+        <h1 v-on:click="homeHandler">Fritter</h1>
         <UserOptions
             v-bind:isLoggedIn="isLoggedIn"
             v-bind:vis="vis"
             v-on:sessionHandler="sessionHandler" 
+            v-on:error="error"
         />
       </header>
       <FreetOptions
         v-bind:isLoggedIn="isLoggedIn"
         v-bind:vis="vis"
-        v-on:freetHandler="freetHandler"
-        v-on:errorHandler="errorHandler"
+        v-on:success="success"
+        v-on:error="error"
       />
       <span class="main">
         <Following
@@ -31,6 +32,7 @@
           v-on:delete="deleteHandler"
           v-on:edit="editHandler"
           v-on:followedHandler="followedHandler"
+          v-on:freetHandler="freetHandler"
         />
       </span>
     </main>
@@ -70,8 +72,32 @@
             this.isLoggedIn = true;
             this.user = localStorage.user;
           }
-          if (localStorage.responseProps) {
-            this.responseProps = localStorage.responseProps;
+          if (localStorage.lastCall) {
+            if (this.user != '') {
+              switch (localStorage.lastCall) {
+                case 'all':
+                  const fields = {}
+                  viewAllFreets(fields, this.success, this.error);
+                  break;
+                case 'author':
+                  if (localStorage.author) {
+                    const fields = {
+                      author: localStorage.author
+                    }
+                    viewFreetsByAuthor(fields, this.success, this.error);
+                  } else {
+                    localStorage.lastCall = 'home';
+                    this.homeHandler();
+                  }
+                  break;
+                default:
+                  localStorage.lastCall = 'home';
+                  this.homeHandler();
+              }
+            } else {
+              localStorage.lastCall = 'home';
+              this.homeHandler();
+            }
           }
         },
         watch: {
@@ -101,15 +127,12 @@
               localStorage.user = this.user;
             },
             freetHandler(message, freets) {
-              console.log(message);
-              console.log('hi');
               this.responseProps = {
                 message: message,
                 freets: freets
               };
             },
             errorHandler(message) {
-              console.log('hi');
               this.responseProps = {
                 message: message,
                 freets: []
@@ -145,8 +168,48 @@
                 this.followed = obj.data.followed;
             },
             error(obj) {
-              const message = ["Error",obj.status,obj.statusText,"-",obj.data.error].join(' ');
-              this.errorHandler(message);
+              if (obj.status==403) {
+                localStorage.lastCall = 'home';
+                if (this.isLoggedIn) {
+                  // logged out on server, but logged in on client-side
+                  // update client-side to logged in
+                  this.user = '';
+                  this.sessionHandler(false, obj.data.error, this.user);
+                } else {
+                  // logged out on client-side, but logged in on server
+                  // update client-side to logged out
+                  this.user = obj.data.user;
+                  this.sessionHandler(true, obj.data.error, this.user);
+                }
+                this.homeHandler();
+              } else {
+                const message = ["Error",obj.status,obj.statusText,"-",obj.data.error].join(' ');
+                this.errorHandler(message);
+              }
+            },
+            success(obj) {
+              let freets = [];
+              // create properties for each freet
+              for (let [key, value] of Object.entries(obj.data.freets)) {
+                  freets.push({
+                      id: value.id,
+                      content: value.content,
+                      author: value.author
+                  });
+              };
+              // sort freets by id (greatest -> smallest), so most recent freets displayed first
+              freets.sort((a, b) => (parseInt(a.id) < parseInt(b.id)) ? 1 : -1);
+              this.responseProps = {
+                freets: freets,
+                message: obj.data.msg
+              };
+            },
+            homeHandler() {
+              localStorage.lastCall = 'home';
+              this.responseProps = {
+                freets: [],
+                message: 'Welcome!'
+              }
             }
         }
     } 
@@ -175,17 +238,17 @@ input {
 }
 
 input[type="button"] {
-  background-color: var(--darkblue);
+  background-color: var(--blue);
   color: white;
   padding: 10px;
-  margin: 4px;
+  margin: 6px;
   font-weight: bold;
 }
 
 
 input[type="button"]:hover {
     cursor: pointer;
-    background-color: var(--blue);
+    background-color: var(--lightblue);
 }
 
 input[type="button"]:focus {
@@ -196,37 +259,36 @@ input[type="button"]:focus {
   display: inline-flex;
   width: calc(100% - 10px);
   justify-content: space-between;
-  background-color: lightgray;
-  padding: 5px;
+  background-color: var(--darkblue);
+  border-bottom: solid;
+  border-color: var(--blue);
+  padding: 7px;
+  padding-left: 5px;
+  padding-right: 5px;
   height: 42px;
 }
 
 h1 {
   margin-top: auto;
   margin-bottom: auto;
+  padding-left: 5px;
+  color: white;
+  font-weight: normal;
+}
+
+h1:hover {
+  color: var(--lightblue);
 }
 
 .main {
   display: inline-flex;
   width: 100%;
-  height: calc(100vh - 106px);
+  height: calc(100vh - 112px);
+  overflow: hidden;
 }
 
 html, body, #app {
   height: 100vh;
   margin: 0px;
 }
-
-/* #nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-} */
 </style>

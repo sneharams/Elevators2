@@ -164,9 +164,10 @@ router.put(
     '/followed/:author?',
     [
         validateThat.userIsLoggedIn,
+        validateThat.authorExists
     ],
     (req, res) => {
-        let followed = Users.addAuthorToFollowed(req.session.user_id, req.body.author);
+        let followed = Users.addAuthorToFollowed(req.session.user_id, req.params.author);
         let msg = {
             msg: "Here is an updated array of who you follow.",
             followed: followed

@@ -162,22 +162,25 @@
             },
             // error to be displayed in main response area
             sessionError(obj) {
-                if (obj.status==403) {
-                    if (this.isLoggedIn) {
-                        // logged out on server, but logged in on client-side
-                        // update client-side to logged in
-                        this.user = '';
-                        this.$emit("sessionHandler", false, obj.data.error, this.user);
-                    } else {
-                        // logged out on client-side, but logged in on server
-                        // update client-side to logged out
-                        this.user = obj.data.user;
-                        this.$emit("sessionHandler", true, obj.data.error, this.user);
-                    }
-                    this.closeHandler();
-                } else {
-                    this.$emit("sessionHandler", this.isLoggedIn, obj.data.error, this.user);
-                }
+                this.username = '';
+                this.message = '';
+                this.$emit('error', obj);
+                // if (obj.status==403) {
+                //     if (this.isLoggedIn) {
+                //         // logged out on server, but logged in on client-side
+                //         // update client-side to logged in
+                //         this.user = '';
+                //         this.$emit("sessionHandler", false, obj.data.error, this.user);
+                //     } else {
+                //         // logged out on client-side, but logged in on server
+                //         // update client-side to logged out
+                //         this.user = obj.data.user;
+                //         this.$emit("sessionHandler", true, obj.data.error, this.user);
+                //     }
+                //     this.closeHandler();
+                // } else {
+                //     this.$emit("sessionHandler", this.isLoggedIn, obj.data.error, this.user);
+                // }
             },
             // error to be displayed in top-right form
             // exception if error is 403
@@ -219,18 +222,22 @@
         background-color: var(--blue);
     }
 
+    .openForm input:hover + div {
+        background-color: var(--lightblue);
+    }
+
     .openForm div {
         background-color: var(--blue);
         color: var(--blue);
-        margin-left: 4px;
-        margin-right: 4px;
-        margin-top: -4px;
-        height: 9px;
+        margin-left: 6px;
+        margin-right: 6px;
+        margin-top: -6px;
+        height: 12px;
     }
 
     .closedForm input {
         border-radius: 4px 4px 4px 4px;
-        background-color: var(--darkblue);
+        background-color: var(--blue);
     }
 
     .closedForm div {
@@ -240,11 +247,6 @@
     .optionsSection {
         display: flex;
         flex-direction: column;
-    }
-
-    input[type="button"]:hover {
-        cursor: pointer;
-        background-color: var(--blue) !important;
     }
 
     .userOptions {
@@ -280,15 +282,15 @@
     }
 
     .name {
-        margin-top: auto;
-        margin-bottom: auto;
+        height: 22px;
+        margin-top: 12px;
         margin-right: 5px;
-        font-weight: bold;
         font-size: 20px;
         border-right: solid;
+        color: white;
         border-width: 2px;
-        border-color: gray;
-        padding-right: 5px;
+        border-color: var(--lightblue);
+        padding-right: 10px;
         padding-bottom: 1px;
     }
 
