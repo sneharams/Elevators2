@@ -4,7 +4,7 @@
                 <div class="author">
                     <button v-bind:class="authorClass" class="tooltip" v-on:click="followHandler">
                         <img class="icon" src="../assets/profile.png"/>
-                        {{ freet.author }}
+                        {{ author }}
                         <span class="tooltiptext tooltiptextauthor"> {{ isFollowing }}</span>
                     </button>
                 </div>
@@ -13,14 +13,21 @@
                         <span class="tooltiptext tooltiptextid">ID</span>
                         {{ freet.id }}
                     </h4></div>
-                    <div class="options" :style="{visibility: isAuthor}">
+                    <div class="options" v-if="freet.author == user">
                         <input 
                             class="optionsButton"
+                            v-bind:class="{optionsButtonOpen : optionsOpen}" 
                             type="button" 
-                            value=":" 
+                            :value="optionsButton" 
                             v-on:click="optionsHandler"
                         />
-                        <div class="optionItems" :style="{visibility: optionsVis}">
+                        <div class="optionItems" v-if="optionsOpen">
+                            <div/>
+                            <input 
+                                type="button" 
+                                value="Edit" 
+                                v-on:click="editHandler"
+                            />
                             <input 
                                 type="button" 
                                 value="Delete" 
@@ -30,19 +37,20 @@
                     </div>
                 </section>
             </span>
-            <div class="content">{{ freet.content }}</div>
+            <div class="content">{{ freetContent }} {{ edited }} </div>
             <ParentFreet 
                 v-if="parentID"
                 v-bind:author="parent.author"
                 v-bind:content="parent.content"
+                v-bind:edited="parent.edited"
                 v-bind:id="parent.id"
                 v-bind:user="user"
                 v-bind:followed="followed"
                 v-on:error="error"
                 v-on:success="freetSuccess"
             />
-            <div class="error" :style="{visibility: errorVis}">{{message}}</div>
-            <div v-bind:class="editorClass">
+            <div class="error" v-if="message.length > 0">{{message}}</div>
+            <div class="editor" v-if="isEditing">
                 <section class="editHeader">
                 <label> {{ inputTitle }}</label>
                     <div class="editOptions">
@@ -53,10 +61,10 @@
                 <textarea v-model="content"/>
                 
             </div>
-            <div v-bind:class="actionsClass">
+            <div class="actions" v-if="!isEditing">
                 <h4 class="votes">
                     <!-- update to be dynamic with upvotes on actual freet-->
-                    {{ freet.upvotes }}
+                    {{ upvoteNum }}
                 </h4>
                 <input
                     class="voteButton"
@@ -79,7 +87,7 @@
     import ParentFreet from './ParentFreet.vue';
     export default {
         name: 'Freet',
-        props: ['freet', 'user', 'followed', 'parentID', 'upvotes'],
+        props: ['freet', 'author', 'freetContent', 'edited', 'upvoteNum', 'user', 'followed', 'parentID', 'upvotes'],
         components: {ParentFreet},
         data() {
             return {
@@ -90,8 +98,6 @@
                 voteClass: 'unvoted',
                 authorClass: 'notFollowed',
                 isFollowing: 'Not Following',
-                editorClass: 'hidden',
-                actionsClass: 'actions',
                 inputTitle: 'Edit Content',
                 submitHandler: this.editSubmit,
                 submitValue: 'Update',
@@ -146,18 +152,12 @@
                     this.submitHandler = this.refreetSubmit;
                     this.submitValue = 'Post';
                 }
-            }
+            },
         },
         computed: {
-            isAuthor: function() {
-                return this.user==this.freet.author ? 'visible' : 'hidden'
-            },
-            optionsVis: function() {
-                return this.optionsOpen ? 'visible' : 'hidden';
-            },
-            errorVis: function() {
-                return this.message.length>0 ? 'visible' : 'hidden';
-            },
+            optionsButton: function() {
+                return this.optionsOpen ? 'x' : ':';
+            }
         },
         beforeMount() {
             if (this.followed.includes(this.freet.author)) {
@@ -198,6 +198,7 @@
                 this.optionsHandler();
                 this.inputTitle = "Edit Content"
                 this.content = this.freet.content;
+                this.textHandler();
             },
             followHandler() {
                 const fields = {
@@ -286,6 +287,7 @@
                     author: null,
                     content: null,
                     id: this.parentID,
+                    edited: null
                 }  
             }
         }
@@ -296,7 +298,9 @@
 
     li {
         background-color: var(--lightblue);
-        margin: 10px;
+        margin: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 2px 4px var(--darkblue);
     }
 
     .header {
@@ -310,8 +314,48 @@
     }
 
     .options {
-        width: 20px;
-        height: 20px;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .optionItems {
+        position: relative;
+        z-index: 30;
+        width: 100px;
+        height: 93px;
+        right: calc(100px - 24px);
+        display: flex;
+        flex-direction: column;
+        background-color: var(--lightblue);
+        border-radius: 4px 0px 4px 4px;
+        
+    }
+
+    .optionItems::before {
+        position: absolute;
+        content: '';
+        background-color: var(--blue);
+        border-radius: 4px 0px 4px 4px;
+        z-index: -1;
+        width: 100px;
+        height: 93px;
+        filter: drop-shadow(0px 2px 2px var(--darkblue));
+        clip-path: polygon(-4px -4px, 76px -4px, 76px 6px, 104px 6px, 104px 100px, -4px 100px);
+    }
+
+    .optionItems div {
+        position: absolute;
+        z-index: -31;
+        top: -24px;
+        left: calc(100px - 24px);
+        width: 24px;
+        height: 30px;
+        background-color: var(--blue);
+        box-shadow: 0px 2px 4px var(--darkblue);
+        border-radius: 12px 12px 0px 0px;
+        clip-path: inset(0px -4px 0px -4px);
     }
 
     .optionsButton {
@@ -319,9 +363,19 @@
         width: 24px;
         margin: 0px !important;
         position: relative;
-        top: -4px;
+        z-index: 31;
         border-radius: 15px;
         padding-top: 4px !important;
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+    }
+
+    .optionsButtonOpen {
+        background-color: var(--blue) !important;
+    }
+
+    .optionsButtonOpen:hover {
+        background-color: var(--offblue) !important;
     }
 
     button {
@@ -332,28 +386,8 @@
         font-size: 16px;
     }
 
-    .visParent {
-        visibility: visible;
-        height: 20px;
-        background-color: var(--darkblue);
-    }
-
-    .visParent:hover {
-        background-color: var(--blue);
-    }
-
-    .hidParent {
-        visibility: hidden;
-        height: 0px;
-    }
-
     .editor {
         height: 150px;
-    }
-
-    .hidden {
-        visibility: hidden;
-        height: 0px;
     }
 
     .followed {
@@ -374,6 +408,7 @@
 
     .id {
         margin-right: 5px;
+        margin-top: 2px;
     }
 
     .actions {
@@ -416,206 +451,198 @@
         padding-top: 8px !important;
         margin-right: 0px !important;
         margin-bottom: 0px !important;
+        border-radius: 4px 4px 0px 0px !important;
     }
     
-.author {
-  display: inline-flex;
-  float: left;
-  flex-grow: 1;
-  height: 20px;
-  margin-left: 5px;
-}
+    .author {
+        display: inline-flex;
+        float: left;
+        flex-grow: 1;
+        height: 20px;
+        margin-left: 5px;
+        margin-top: 2px;
+    }
 
-h4 {
-  margin-top: 0px;
-  margin-bottom: 0px;
-}
+    h4 {
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
 
-.content {
-  color: black;
-  border-top: solid;
-  border-width: 1px;
-  padding-top: 10px;
-  border-color: slategray;
-  margin-top: 10px;
-}
+    .content {
+        color: black;
+        border-top: solid;
+        border-width: 1px;
+        padding-top: 10px;
+        border-color: slategray;
+        margin-top: 4px;
+    }
 
-.voteButton {
-    border-radius: 0px 4px 4px 0px;
-    margin-left: 0px;
-}
+    .voteButton {
+        border-radius: 0px 4px 4px 0px;
+        margin-left: 0px;
+    }
 
-.contentbox {
-    margin-left: auto;
-    margin-right: auto;
-    padding: 2%;
-    max-width: 800px;
-}
+    .contentbox {
+        margin-left: auto;
+        margin-right: auto;
+        padding: 2%;
+        max-width: 800px;
+    }
 
 
-/* for tooltips clarifying what text is author and what is ID */
-.tooltip {
-  position: relative;
-  display: inline-block;
-  border-bottom: 1px dotted gray;
-}
+    /* for tooltips clarifying what text is author and what is ID */
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        border-bottom: 1px dotted gray;
+    }
 
-.tooltip .tooltiptextid {
-  visibility: hidden;
-  margin-left: -15px;
-  background-color: gray;
-  font-size: 10px;
-  color: #fff;
-  text-align: center;
-  padding: 5px;
-  border-radius: 6px;
-  position: absolute;
-  right: 100%;
-  margin-right: 5px;
-  margin-top: -2px;
-  opacity: 0;
-  transition: opacity 1s;
-}
+    .tooltip .tooltiptextid {
+        visibility: hidden;
+        margin-left: -15px;
+        background-color: gray;
+        font-size: 10px;
+        color: #fff;
+        text-align: center;
+        padding: 5px;
+        border-radius: 6px;
+        position: absolute;
+        right: 100%;
+        margin-right: 5px;
+        margin-top: -2px;
+        opacity: 0;
+        transition: opacity 1s;
+    }
 
-.tooltip .tooltiptextauthor {
-  background-color: gray;
-  font-size: 10px;
-  color: #fff;
-  text-align: center;
-  padding: 5px;
-  border-radius: 6px;
-  position: absolute;
-  visibility: hidden;
-  left: 100%;
-  top: 10%;
-  margin-top: -2px;
-  margin-left: 5px;
-  opacity: 0;
-  transition: opacity 1s;
-}
+    .tooltip .tooltiptextauthor {
+        background-color: gray;
+        font-size: 10px;
+        color: #fff;
+        text-align: center;
+        padding: 5px;
+        border-radius: 6px;
+        position: absolute;
+        visibility: hidden;
+        left: 100%;
+        top: 10%;
+        margin-top: -2px;
+        margin-left: 5px;
+        opacity: 0;
+        transition: opacity 1s;
+    }
 
-.tooltip .tooltiptextid::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 100%;
-  margin-top: -4px;
-  border-width: 3px;
-  border-style: solid;
-  border-color: transparent transparent transparent gray;
-}
+    .tooltip .tooltiptextid::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 100%;
+        margin-top: -4px;
+        border-width: 3px;
+        border-style: solid;
+        border-color: transparent transparent transparent gray;
+    }
 
-.tooltip .tooltiptextauthor::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: 100%;
-  margin-top: -4px;
-  border-width: 3px;
-  border-style: solid;
-  border-color: transparent gray transparent transparent;
-}
+    .tooltip .tooltiptextauthor::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 100%;
+        margin-top: -4px;
+        border-width: 3px;
+        border-style: solid;
+        border-color: transparent gray transparent transparent;
+    }
 
-.tooltip:hover .tooltiptextid {
-  visibility: visible;
-  opacity: 1;
-}
+    .tooltip:hover .tooltiptextid {
+        visibility: visible;
+        opacity: 1;
+    }
 
-.tooltip:hover .tooltiptextauthor {
-  visibility: visible;
-  opacity: 1;
-}
+    .tooltip:hover .tooltiptextauthor {
+        visibility: visible;
+        opacity: 1;
+    }
 
-.message {
-  padding-left: 3.5%;
-}
+    .message {
+        padding-left: 3.5%;
+    }
 
-.upvoted {
-    background-color: var(--blue) !important;
-}
+    .upvoted {
+        background-color: var(--blue) !important;
+    }
 
-.unvoted {
-    background-color: var(--darkblue) !important;
-}
+    .unvoted {
+        background-color: var(--darkblue) !important;
+    }
 
-.unvoted:hover, .upvoted:hover {
-    background-color: var(--offblue) !important;
-}
+    .unvoted:hover, .upvoted:hover {
+        background-color: var(--offblue) !important;
+    }
 
-input {
-    border: none;
-    height: 34px;
-}
+    input {
+        border: none;
+        height: 34px;
+    }
 
-input[type="button"] {
-    background-color: var(--blue);
-    color: white;
-    padding: 10px;
-    margin: 4px;
-    font-weight: bold;
-}
+    input[type="button"] {
+        background-color: var(--blue);
+        color: white;
+        padding: 10px;
+        margin: 4px;
+        font-weight: bold;
+    }
 
-input[type="button"]:focus {
-    outline: none;
-}
+    input[type="button"]:focus {
+        outline: none;
+    }
 
-input[type="button"]:hover {
-    cursor: pointer;
-    background-color: var(--blue);
-}
+    input[type="button"]:hover {
+        cursor: pointer;
+        background-color: var(--blue);
+    }
 
-input[type="button"]:disabled {
-    background-color: gray;
-}
+    input[type="button"]:disabled {
+        background-color: gray;
+    }
 
-input[type="text"] {
-    width: 285px;
-    float: right;
-    padding-left: 10px;
-}
+    input[type="text"] {
+        width: 285px;
+        float: right;
+        padding-left: 10px;
+    }
 
-header {
-    height: 30px;
-}
+    header {
+        height: 30px;
+    }
 
-img {
-    height: 16px;
-    width: 16px;
-}
+    img {
+        height: 16px;
+        width: 16px;
+    }
 
-form > * {
-    margin-top: 10px;
-    margin-left: 10px;
-    width: 380px;
-    display: inline-flex;
-    justify-content: space-between;
-}
+    form > * {
+        margin-top: 10px;
+        margin-left: 10px;
+        width: 380px;
+        display: inline-flex;
+        justify-content: space-between;
+    }
 
-form > :last-child {
-    margin-bottom: 10px;
-}
+    form > :last-child {
+        margin-bottom: 10px;
+    }
 
-label {
-    margin-top: auto;
-    margin-bottom: auto;
-}
+    label {
+        margin-top: auto;
+        margin-bottom: auto;
+    }
 
-.formbutton {
-    margin: 0px !important;
-}
+    .formbutton {
+        margin: 0px !important;
+    }
 
-.formbutton:hover {
-    background-color: var(--lightblue) !important;
-}
+    .formbutton:hover {
+        background-color: var(--lightblue) !important;
+    }
 
-.close {
-    width: 34px;
-    margin-right: 10px !important;
-    padding-top: 4px !important;
-    padding-bottom: 5px !important;
-}
-
-.submit {
-    width: 346px;
-}
 </style>

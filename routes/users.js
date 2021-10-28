@@ -140,7 +140,7 @@ router.delete(
 router.get(
     '/followed',
     [
-        validateThat.userIsLoggedIn
+        validateThat.userIsLoggedIn,
     ],
     (req, res) => {
         let followed = Users.getUserFollowed(req.session.user_id);
@@ -187,7 +187,8 @@ router.put(
     '/followed/:author?',
     [
         validateThat.userIsLoggedIn,
-        validateThat.authorExists
+        validateThat.authorExists,
+        validateThat.authorIsNotFollowed
     ],
     (req, res) => {
         let followed = Users.addAuthorToFollowed(req.session.user_id, req.params.author);
@@ -211,7 +212,8 @@ router.put(
     '/followed/:author?',
     [
         validateThat.userIsLoggedIn,
-        validateThat.authorExists
+        validateThat.authorExists,
+        validateThat.authorIsFollowed
     ],
     (req, res) => {
         let followed = Users.removeAuthorFromFollowed(req.session.user_id, req.params.author);

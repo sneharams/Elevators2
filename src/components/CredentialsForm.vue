@@ -8,7 +8,7 @@
             <label>Password</label>
             <input type="text" v-model="password">
         </div>
-        <div :style="{visibility: message.length>0 ? 'visible' : 'hidden'}">
+        <div v-if="message.length>0">
             {{ message }}
         </div>
         <div>
@@ -52,25 +52,8 @@
         height: 34px;
     }
 
-    input[type="button"] {
-        background-color: var(--darkblue) !important;
-        color: white;
-        padding: 10px;
-        margin: 4px;
-        font-weight: bold;
-    }
-
-    input[type="button"]:focus {
-        outline: none;
-    }
-
-    input[type="button"]:hover {
-        cursor: pointer;
-        background-color: var(--lightblue) !important;
-    }
-
     input[type="text"] {
-        width: 285px;
+        width: 290px;
         float: right;
         padding-left: 10px;
     }
@@ -85,10 +68,11 @@
         position: relative;
         font-weight: bold;
         color: var(--std-color);
-        background-color: var(--offblue);
+        background-color: var(--lightblue);
         width: 400px;
         margin-right: -5px;
         padding-top: 5px;
+        border-radius: 8px 8px 8px 8px;
     }
 
     form > * {
@@ -105,6 +89,7 @@
     }
 
     label {
+        font-size: 14px;
         margin-top: auto;
         margin-bottom: auto;
     }
@@ -114,7 +99,7 @@
     }
 
     .formbutton:hover {
-        background-color: var(--lightblue) !important;
+        background-color: var(--offblue) !important;
     }
 
     .close {

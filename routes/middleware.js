@@ -28,9 +28,9 @@ const credentialsAreAuthorized = (req, res, next) => {
 // Checks that the username is of valid formatting
 const usernameIsValid = (req, res, next) => {
     const username = req.body.username;
-    if (!(/^[A-Za-z0-9]+$/.test(username) && username.length >= 4)) {
+    if (!(/^[A-Za-z0-9]+$/.test(username) && username.length >= 4 && username.length <=16)) {
         res.status(400).json({
-            error: `Invalid username: ${username}. Must be at least 4 characters and only contain letters and numbers.`,
+            error: `Invalid username: ${username}. Must be between 4 and 16 characters (inclusive) and only contain letters and numbers.`,
         }).end();
         return;
     }
@@ -182,6 +182,26 @@ const freetIsUpvoted = (req, res, next) => {
     next();
 }
 
+const authorIsFollowed = (req, res, next) => {
+    const followed = Users.getUserFollowed(req.session.user_id);
+    if (!followed.includes(req.params.author)) {
+        res.status(409).json({
+            error: `Author: ${req.params.author} wasn't followed previously.`
+        }).end();
+        return;
+    }
+}
+
+const authorIsNotFollowed = (req, res, next) => {
+    const followed = Users.getUserFollowed(req.session.user_id);
+    if (followed.includes(req.params.author)) {
+        res.status(409).json({
+            error: `Author: ${req.params.author} was already followed.`
+        }).end();
+        return;
+    }
+}
+
 
 
 module.exports = Object.freeze({
@@ -199,5 +219,7 @@ module.exports = Object.freeze({
     freetIsByUser,
     freetTextIsWithinLimit,
     freetIsNotUpvoted,
-    freetIsUpvoted
+    freetIsUpvoted,
+    authorIsFollowed,
+    authorIsNotFollowed
 });

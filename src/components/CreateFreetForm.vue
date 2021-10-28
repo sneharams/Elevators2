@@ -2,7 +2,7 @@
     <form class="box">
         <label>Content:</label>
         <textarea v-model="content"/>
-        <div :style="{visibility: message.length>0 ? 'visible' : 'hidden'}">
+        <div v-if="message.length>0">
             {{ message }}
         </div>
         <div>
@@ -55,14 +55,17 @@
     }
 
     .box {
-        z-index: 20;
+        z-index: 40;
         position: relative;
         font-weight: bold;
         color: White;
         background-color: var(--blue);
         width: 400px;
         padding-top: 5px;
-        right: 290px;
+        right: 300px;
+        border-radius: 8px 0px 8px 8px;
+        box-shadow: 0px 2px 4px var(--darkblue);
+        clip-path: inset(0px -4px -4px -4px);
     }
 
     .box > * {
@@ -81,6 +84,7 @@
     label {
         margin-top: auto;
         margin-bottom: auto;
+        font-size: 14px;
     }
 
     .formbutton {

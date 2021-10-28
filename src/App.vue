@@ -22,13 +22,13 @@
         <Following
           v-bind:key="follow"
           v-bind:isLoggedIn="isLoggedIn"
-          v-bind:vis="vis"
           v-bind:user="user"
           v-bind:followed="followed"
           v-on:freetHandler="success"
           v-on:errorHandler="error"
         />
         <Response 
+          v-bind:key="refresh"
           v-bind:response="responseProps" 
           v-bind:followed="followed"
           v-bind:upvotes="upvotes"
@@ -38,6 +38,7 @@
           v-on:followedHandler="followedHandler"
           v-on:freetHandler="freetHandler"
           v-on:vote="voteHandler"
+          v-on:sort="sortHandler"
         />
       </span>
     </main>
@@ -62,7 +63,9 @@
                 user: '',
                 follow: true,
                 followed: [],
-                upvotes: []
+                upvotes: [],
+                refresh: 0,
+                sortType: 1
             }
         },
         computed: {
@@ -139,12 +142,14 @@
               };
               localStorage.responseProps = this.responseProps;
               localStorage.user = this.user;
+              this.refresh += 1; // reset sort
             },
             freetHandler(message, freets) {
               this.responseProps = {
                 message: message,
                 freets: freets
               };
+              this.sortHandler(this.sortType);
             },
             errorHandler(message) {
               this.responseProps = {
@@ -154,22 +159,19 @@
             },
             editHandler(obj) {
               const freets = this.responseProps.freets;
-              const id = obj.data.freets[0].id;
-              const content = obj.data.freets[0].content;
               for (let i = 0; i < freets.length; i++) {
-                if (freets[i].id == id) {
-                  freets[i].content = content;
+                if (freets[i].id == obj.data.freets[0].id) {
+                  this.responseProps.freets[i] = obj.data.freets[0];
                   break;
                 }
               }
-              this.responseProps.freets = freets;
             },
             deleteHandler(obj) {
               const freets = this.responseProps.freets;
               const id = obj.data.freets[0].id;
               for (let i = 0; i < freets.length; i++) {
                 if (freets[i].id == id) {
-                  freets[i].content = "deleted";
+                  this.responseProps.freets[i].content = "deleted";
                   break;
                 }
               }
@@ -180,16 +182,39 @@
               const id = obj.data.freets[0].id;
               for (let i = 0; i < freets.length; i++) {
                 if (freets[i].id == id) {
-                  freets[i] = obj.data.freets[0];
+                  this.responseProps.freets[i] = obj.data.freets[0];
                   break;
                 }
               }
-              this.responseProps.freets = freets;
               const fields = {};
               getUpvotes(fields, this.upvotesSuccess, this.error);
             },
             followedHandler(authors) {
               this.followed = authors;
+            },
+            sortHandler(type) {
+              let freets = this.responseProps.freets;
+              this.sortType = type;
+              switch (type) {
+                case 1:
+                  freets.sort((a, b) => (parseInt(a.id) < parseInt(b.id)) ? 1 : -1);
+                  break;
+                case 2:
+                  freets.sort((a, b) => (parseInt(a.id) > parseInt(b.id)) ? 1 : -1);
+                  break;
+                case 3:
+                  freets.sort((a, b) => (parseInt(a.id) > parseInt(b.id)) ? 1 : -1);
+                  freets.sort((a, b) => (parseInt(a.upvotes) < parseInt(b.upvotes)) ? 1 : -1);
+                  break;
+                case 4:
+                  freets.sort((a, b) => (parseInt(a.id) > parseInt(b.id)) ? 1 : -1);
+                  freets.sort((a, b) => (parseInt(a.upvotes) > parseInt(b.upvotes)) ? 1 : -1);
+                  break;
+              }
+              this.responseProps = {
+                message: this.responseProps.message,
+                freets: freets
+              }
             },
             followingSuccess(obj) {
               this.followed = obj.data.followed;
@@ -230,6 +255,7 @@
                 freets: freets,
                 message: obj.data.msg
               };
+              this.sortHandler(this.sortType);
             },
             homeHandler() {
               localStorage.lastCall = 'home';
@@ -271,6 +297,7 @@ input[type="button"] {
   padding: 10px;
   margin: 6px;
   font-weight: bold;
+  text-align: center;
 }
 
 

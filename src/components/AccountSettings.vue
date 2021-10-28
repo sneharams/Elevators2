@@ -29,42 +29,33 @@
 
 <style scoped>
 
-    input {
-        border: none;
-        height: 34px;
-    }
-
-    input[type="button"]:focus {
-        outline: none;
-    }
-
-    input[type="button"]:hover {
-        cursor: pointer;
-        background-color: var(--lightblue);
-    }
-
     .accountOptions {
         display: flex;
         flex-direction: column;
-        z-index: 20;
+        z-index: 50;
         position: relative;
         font-weight: bold;
         color: White;
-        background-color: var(--blue);
+        background-color: var(--lightblue);
         width: 160px;
-        margin-right: -5px;
+        margin-right: 6px;
         padding-top: 5px;
+        box-shadow: 0px 2px 4px var(--darkblue);
+        border-radius: 8px 0px 8px 8px;
+        clip-path: inset(0px -4px -4px -4px);
     }
 
     .accountOptions > * {
-        margin-top: 10px;
+        margin-top: 5px;
         margin-left: 10px !important;
         width: 140px;
+        display: block;
+        text-align: center !important;
     }
 
     .accountOptions > :last-child {
         width: 34px;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
         margin-left: 63px !important;
         padding-top: 4px;
         padding-bottom: 5px;

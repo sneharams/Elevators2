@@ -6,7 +6,7 @@
             <input type="button" class="searchButton" value="Search" v-on:click="viewFreetsByAuthorHandler"/>
         </div>
         <div class="create" :style="{visibility: vis}">
-            <input class="createbutton" type="button" value="Create Freet" v-on:click="createFreetFormHandler"/>
+            <input v-bind:class="createClass" type="button" value="Create Freet" v-on:click="createFreetFormHandler"/>
             <div :style="{visibility: formVis}">
                 <CreateFreetForm
                     v-on:success="success"
@@ -28,11 +28,19 @@
             return {
                 searchText: 'Search Freets by Author',
                 createFreetOpen: false,
+                createClass: 'closed',
+                formVis: 'hidden'
             }
         },
-        computed: {
-            formVis: function() {
-                return this.createFreetOpen ? 'visible' : 'hidden';
+        watch: {
+            createFreetOpen: function() {
+                if (this.createFreetOpen) {
+                    this.formVis = 'visible';
+                    this.createClass = 'open';
+                } else {
+                    this.formVis = 'hidden';
+                    this.createClass = 'closed';
+                }
             }
         },
         methods: {
@@ -126,9 +134,17 @@
         margin-right: 10px;
     }
 
-    .createbutton {
+    .closed {
         width: 100px;
         position: relative;
+        right: 10px !important;
+    }
+
+    .open {
+        width: 100px;
+        position: relative;
+        padding-bottom: 34px !important;
+        border-radius: 4px 4px 0px 0px !important;
         right: 10px !important;
     }
 </style>

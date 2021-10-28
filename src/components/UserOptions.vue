@@ -164,22 +164,6 @@
                 this.username = '';
                 this.message = '';
                 this.$emit('error', obj);
-                // if (obj.status==403) {
-                //     if (this.isLoggedIn) {
-                //         // logged out on server, but logged in on client-side
-                //         // update client-side to logged in
-                //         this.user = '';
-                //         this.$emit("sessionHandler", false, obj.data.error, this.user);
-                //     } else {
-                //         // logged out on client-side, but logged in on server
-                //         // update client-side to logged out
-                //         this.user = obj.data.user;
-                //         this.$emit("sessionHandler", true, obj.data.error, this.user);
-                //     }
-                //     this.closeHandler();
-                // } else {
-                //     this.$emit("sessionHandler", this.isLoggedIn, obj.data.error, this.user);
-                // }
             },
             // error to be displayed in top-right form
             // exception if error is 403
@@ -222,10 +206,6 @@
     }
 
     .openForm input:hover + div {
-        background-color: var(--offblue);
-    }
-
-    .openForm input:hover {
         background-color: var(--offblue);
     }
 

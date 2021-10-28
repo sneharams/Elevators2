@@ -1,10 +1,24 @@
 <template>
     <section class="response">
-        <h4 class="message">{{ response.message }}</h4>
+        <h4 class="message">
+            {{ response.message }} 
+            <form v-if="response.freets.length>1">
+            <label class="sortlabel" for="types">Sort Freets By:</label>
+                <select class="sortbar" v-model="selected">
+                    <option v-for="option in options" v-bind:key="option.value" v-bind:value="option.value">
+                        {{ option.text }}
+                    </option>
+                </select>
+            </form>
+        </h4> 
         <ol class="freets" v-bind:class="{scrollbox: isScroll}">
             <Freet 
                 v-for="freet in response.freets"  
                 v-bind:freet="freet"
+                v-bind:freetContent="freet.content"
+                v-bind:edited="freet.edited"
+                v-bind:author="freet.author"
+                v-bind:upvoteNum="freet.upvotes"
                 v-bind:user="user" 
                 v-bind:key="freet.id"
                 v-bind:parentID="freet.parent_id"
@@ -26,10 +40,32 @@
         name: 'Response',
         components: {Freet},
         props: ['response', 'user', 'followed', 'upvotes'],
+        data () {
+            return {
+                selected: 1,
+                options: [
+                    { text: 'Newest', value: 1 },
+                    { text: 'Oldest', value: 2 },
+                    { text: 'Most Upvoted', value: 3 },
+                    { text: 'Least Upvoted', value: 4 }
+                ]
+            }
+        },
         computed: {
             isScroll: function() {
                 return this.response.freets.length>0;
             }
+        },
+        watch: {
+            selected: function() {
+                if (this.selected != 5) {
+                    this.$emit('sort', this.selected);
+                    this.options = this.options.filter(option => option.value != 5);
+                }
+            }
+        },
+        mounted() {
+            this.$emit('sort', this.selected);
         },
         methods: {
             editHandler(obj) {
@@ -44,6 +80,8 @@
                 this.$emit('followedHandler', authors);
             },
             voteHandler(obj) {
+                this.options.push({text: 'Current', value: 5});
+                this.selected = 5;
                 this.$emit('vote', obj);
             },
             successHandler(message, freets) {
@@ -88,6 +126,14 @@
         margin: 0px;
         width: calc(100% - 40px);
         overflow-x: hidden;
+    }
+
+    .sortlabel {
+        width: fit-content;
+    }
+
+    .sortbar {
+        height: 20px;
     }
 
     /* customize scrollbar for dark theme */

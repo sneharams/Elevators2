@@ -2,8 +2,8 @@
     <nav class="following">
         <h3> Following </h3>
         <section v-bind:class="vis"> {{ message }} </section>
-        <div :style="{visibility: vis}">
-            <input type="button" value="All Following" v-on:click="allHandler"/>
+        <div>
+            <input v-if="followed.length>0" type="button" value="All Following" v-on:click="allHandler"/>
             <AuthorButton
                 v-for="author in followed"
                 v-bind:author="author"
@@ -19,14 +19,42 @@
     import AuthorButton from './AuthorButton.vue';
     export default {
         name: 'Following',
-        props: ['isLoggedIn', 'vis', 'user', 'followed'],
+        props: ['isLoggedIn', 'user', 'followed'],
         components: {AuthorButton},
         data() {
             return {
-                message: 'Sign in to view freets from authors you follow!',
+                message: 'Sign in to view Freets from authors you follow!',
+                vis: 'visible'
             }
         },
-
+        watch: {
+            followed: function() {
+                if (this.followed.length > 0) {
+                    this.vis = 'hidden';
+                } else {
+                    this.vis = 'visible';
+                    if (this.isLoggedIn) {
+                        this.message = 'Click the usernames of authors on Freets to follow them!';
+                        
+                    } else {
+                        this.message = 'Sign in to view Freets from authors you follow!';
+                    }
+                }
+            },
+        },
+        mounted() {
+            if (this.followed.length > 0) {
+                this.vis = 'hidden';
+            } else {
+                this.vis = 'visible';
+                if (this.isLoggedIn) {
+                    this.message = 'Click the usernames of authors on Freets to follow them!';
+                    
+                } else {
+                    this.message = 'Sign in to view Freets from authors you follow!';
+                }
+            }
+        },
         methods: {
             authorHandler(author) {
                 const authorText = author;
@@ -80,15 +108,15 @@
     }
 
     input:hover {
-        background-color: var(--lightblue) !important;
+        background-color: var(--offblue) !important;
     }
 
-    .hidden {
+    .visible {
         text-align: center;
         color: lightgray;
     }
 
-    .visible {
+    .hidden {
         height: 0px;
         visibility: hidden;
     }

@@ -15,6 +15,7 @@ let id_num = 0;
  * @prop {string} author  - username of the author
  * @prop {Freet} parent_id - parent freet id (null if original freet)
  * @prop {int} upvotes - number of upvotes of freet >=0 
+ * @prop {string} edited - ' (edited)' if content has been edited, else ''
  */
 
 /**
@@ -37,7 +38,8 @@ class Freets {
     const id = id_num.toString();
     const parent_id = null;
     const upvotes = 0;
-    const freet = {id, content, author, parent_id, upvotes};
+    const edited = '';
+    const freet = {id, content, author, parent_id, upvotes, edited};
     const freet_obj = {id, user_id, freet};
     id_num = id_num + 1;
     data.push(freet_obj);
@@ -126,7 +128,8 @@ class Freets {
    */
   static updateOne(id, content) {
     const freet = Freets.findOne(id);
-    freet.content = content + " (edited)";
+    freet.content = content;
+    freet.edited = ' (edited)';
     return freet;
   }
 
