@@ -53,7 +53,7 @@
     }
 
     input[type="button"] {
-        background-color: var(--darkblue);
+        background-color: var(--darkblue) !important;
         color: white;
         padding: 10px;
         margin: 4px;
@@ -66,7 +66,7 @@
 
     input[type="button"]:hover {
         cursor: pointer;
-        background-color: var(--blue);
+        background-color: var(--lightblue) !important;
     }
 
     input[type="text"] {
@@ -84,8 +84,8 @@
         z-index: 20;
         position: relative;
         font-weight: bold;
-        color: White;
-        background-color: var(--blue);
+        color: var(--std-color);
+        background-color: var(--offblue);
         width: 400px;
         margin-right: -5px;
         padding-top: 5px;

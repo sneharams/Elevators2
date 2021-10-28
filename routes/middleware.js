@@ -102,7 +102,7 @@ const userIsLoggedOut = (req, res, next) => {
 
 // Checks that the username of author exists
 const authorExists = (req, res, next) => {
-    let author = req.params.author; // remove leading '_'
+    let author = req.params.author;
     const user = Users.findUser(author);
     if (!user) {
         res.status(404).json({
@@ -115,7 +115,6 @@ const authorExists = (req, res, next) => {
 
 // Checks that an author is inputted
 const authorInputted = (req, res, next) => {
-    // '_' before every search request, so only '_' means empty search
     if (req.params.author == undefined) {
         res.status(400).json({
             error: `No author name inputted.`,
@@ -161,6 +160,28 @@ const freetTextIsWithinLimit = (req, res, next) => {
     next();
 };
 
+const freetIsNotUpvoted = (req, res, next) => {
+    const user = Users.findUserByID(req.session.user_id);
+    if (user.upvotes.includes(req.params.id)) {
+        res.status(409).json({
+            error: `Freet ID: ${req.params.id} was already upvoted.`
+        }).end();
+        return;
+    }
+    next();
+}
+
+const freetIsUpvoted = (req, res, next) => {
+    const user = Users.findUserByID(req.session.user_id);
+    if (!user.upvotes.includes(req.params.id)) {
+        res.status(409).json({
+            error: `Freet ID: ${req.params.id} wasn't upvoted previously.`
+        }).end();
+        return;
+    }
+    next();
+}
+
 
 
 module.exports = Object.freeze({
@@ -177,4 +198,6 @@ module.exports = Object.freeze({
     freetExists,
     freetIsByUser,
     freetTextIsWithinLimit,
+    freetIsNotUpvoted,
+    freetIsUpvoted
 });

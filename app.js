@@ -59,16 +59,12 @@ app.all('*', (req, res) => {
       GET /api/freets -- Vew all freets on the server
       <br>
       GET /api/freets/:author -- View all freets on the server by the user with the username :author
-      * the author search text is automatically modified so that the author parameter leads with '_' (ex. '_user')
-      * if querying directly from url bar, then use below, where author is the actual username without the leading '_'
-      * GET /api/freets/_:author
       <br>
       POST /api/freets -- Create and store a new freet on the server with the content
       <br>
       PUT /api/freets/:id -- View the freet on the server with the id :id
       <br>
       DELETE /api/freets/:id -- Delete the freet on the server with the id :id
-
     `;
   
     res.status(404).send(errorMessage);

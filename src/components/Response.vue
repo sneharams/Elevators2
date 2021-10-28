@@ -1,17 +1,20 @@
 <template>
     <section class="response">
-        <h3 class="message">{{ response.message }}</h3>
+        <h4 class="message">{{ response.message }}</h4>
         <ol class="freets" v-bind:class="{scrollbox: isScroll}">
             <Freet 
                 v-for="freet in response.freets"  
                 v-bind:freet="freet"
                 v-bind:user="user" 
                 v-bind:key="freet.id"
+                v-bind:parentID="freet.parent_id"
                 v-bind:followed="followed"
+                v-bind:upvotes="upvotes"
                 v-on:edit="editHandler"
                 v-on:delete="deleteHandler"
                 v-on:updateFollowed="followedHandler"
                 v-on:success="successHandler"
+                v-on:vote="voteHandler"
             />
         </ol>
     </section>
@@ -22,7 +25,7 @@
     export default {
         name: 'Response',
         components: {Freet},
-        props: ['response', 'user', 'followed'],
+        props: ['response', 'user', 'followed', 'upvotes'],
         computed: {
             isScroll: function() {
                 return this.response.freets.length>0;
@@ -40,6 +43,9 @@
                 console.log(authors);
                 this.$emit('followedHandler', authors);
             },
+            voteHandler(obj) {
+                this.$emit('vote', obj);
+            },
             successHandler(message, freets) {
                 this.$emit('freetHandler', message, freets);
             }
@@ -52,7 +58,6 @@
         flex-grow: 1;
         display: flex;
         flex-direction: column;
-        background-color: gainsboro;
     }
 
     ol {
@@ -60,15 +65,15 @@
         visibility: 'hidden';
     }
 
-    h3 {
+    h4 {
         padding-left: 0px;
         padding-right: 0px;
         padding-top: 15px;
         padding-bottom: 10px;
         margin-top: 0px;
         margin-bottom: 0px;
-        background-color: gray;
-        color: white;
+        background-color: #E5ECF5;
+        color: var(--std-color);
         text-align: center;
     }
 
@@ -76,8 +81,7 @@
         visibility: visible;
         border-bottom: solid;
         border-bottom-width: 2vh;
-        border-color: gray;
-        background-color: gainsboro;
+        border-color: #E5ECF5;
         flex-grow: 1;
         padding-left: 20px;
         padding-right: 20px;

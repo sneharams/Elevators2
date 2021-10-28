@@ -5,7 +5,7 @@
         <div :style="{visibility: vis}">
             <input type="button" value="All Following" v-on:click="allHandler"/>
             <AuthorButton
-                v-for="author in authors"
+                v-for="author in followed"
                 v-bind:author="author"
                 v-bind:key="author"
                 v-on:authorHandler="authorHandler"
@@ -19,11 +19,10 @@
     import AuthorButton from './AuthorButton.vue';
     export default {
         name: 'Following',
-        props: ['isLoggedIn', 'vis', 'user', 'authors'],
+        props: ['isLoggedIn', 'vis', 'user', 'followed'],
         components: {AuthorButton},
         data() {
             return {
-                freets: [],
                 message: 'Sign in to view freets from authors you follow!',
             }
         },
@@ -35,29 +34,19 @@
                     author: authorText
                 }
                 viewFreetsByAuthor(fields, this.success, this.error);
+                localStorage.lastCall = 'author';
+                localStorage.author = authorText;
             },
             allHandler() {
                 const fields = {};
                 viewFreetsByFollowedAuthors(fields, this.success, this.error);
+                localStorage.lastCall = 'all followed';
             },
             success(obj) {
-              console.log('freet options hi');
-              let freets = [];
-              // create properties for each freet
-              for (let [key, value] of Object.entries(obj.data.freets)) {
-                  freets.push({
-                      id: value.id,
-                      content: value.content,
-                      author: value.author
-                  });
-              };
-              // sort freets by id (greatest -> smallest), so most recent freets displayed first
-              freets.sort((a, b) => (parseInt(a.id) < parseInt(b.id)) ? 1 : -1);
-              this.$emit('freetHandler', obj.data.msg, freets);
+                this.$emit('freetHandler', obj);
             },
             error(obj) {
-              const message = ["Error",obj.status,obj.statusText,"-",obj.data.error].join(' ');
-              this.$emit('errorHandler', message);
+                this.$emit('errorHandler', obj);
             }
         }
     }

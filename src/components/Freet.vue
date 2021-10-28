@@ -1,104 +1,119 @@
 <template>
     <li class="contentbox"> 
-        <span class="header">    
-            <div class="author">
-                <button v-bind:class="authorClass" class="tooltip" v-on:click="followHandler">
-                    <img class="icon" src="../assets/profile.png"/>
-                    <!-- update to make it clickable link to see author freets/follow -->
-                    {{ freet.author }}
-                    <span class="tooltiptext tooltiptextauthor"> {{ isFollowing }}</span>
-                </button>
-            </div>
-            <section class="end">
-                <div><h4 class="tooltip id">
-                    <span class="tooltiptext tooltiptextid">ID</span>
-                    {{ freet.id }}
-                </h4></div>
-                <div class="options" :style="{visibility: isAuthor}">
-                    <input 
-                        class="optionsButton"
-                        type="button" 
-                        value=":" 
-                        v-on:click="optionsHandler"
-                    />
-                    <div class="optionItems" :style="{visibility: optionsVis}">
-                        <!-- todo: create tooltip for why disabled -->
+            <span class="header">    
+                <div class="author">
+                    <button v-bind:class="authorClass" class="tooltip" v-on:click="followHandler">
+                        <img class="icon" src="../assets/profile.png"/>
+                        {{ freet.author }}
+                        <span class="tooltiptext tooltiptextauthor"> {{ isFollowing }}</span>
+                    </button>
+                </div>
+                <section class="end">
+                    <div><h4 class="tooltip id">
+                        <span class="tooltiptext tooltiptextid">ID</span>
+                        {{ freet.id }}
+                    </h4></div>
+                    <div class="options" :style="{visibility: isAuthor}">
                         <input 
-                            :disabled="edit ? true : false"
+                            class="optionsButton"
                             type="button" 
-                            value="Edit" 
-                            v-on:click="editHandler"
+                            value=":" 
+                            v-on:click="optionsHandler"
                         />
-                        <input 
-                            type="button" 
-                            value="Delete" 
-                            v-on:click="deleteHandler"
-                        />
+                        <div class="optionItems" :style="{visibility: optionsVis}">
+                            <input 
+                                type="button" 
+                                value="Delete" 
+                                v-on:click="deleteHandler"
+                            />
+                        </div>
                     </div>
-                </div>
-            </section>
-        </span>
-        <div class="content">{{ freet.content }}</div>
-        <button v-bind:class="parentClass" v-on:click="parentHandler">
-            {{ parent.author }}-{{ parent.id }}
-        </button>
-        <div class="error" :style="{visibility: errorVis}">{{message}}</div>
-        <div class="editor" :style="{visibility: editorVis, height: editorHeight}">
-            <section class="editHeader">
-            <label> {{ inputTitle }}</label>
-                <div class="editOptions">
-                    <input type="button" value="Cancel" v-on:click="cancelHandler"/>
-                    <input type="button" value="Update" v-on:click="updateHandler"/>
-                </div>
-            </section>
-            <textarea v-model="content"/>
-            
-        </div>
-        <div class="actions">
-            <h4 class="votes">
-                <!-- update to be dynamic with upvotes on actual freet-->
-                {{ upvotes }}
-            </h4>
-            <input
-                class="voteButton"
-                type="button"
-                value="Upvote"
-                :style="{backgroundColor: upvoteColor}"
-                v-on:click="upvoteHandler"
+                </section>
+            </span>
+            <div class="content">{{ freet.content }}</div>
+            <ParentFreet 
+                v-if="parentID"
+                v-bind:author="parent.author"
+                v-bind:content="parent.content"
+                v-bind:id="parent.id"
+                v-bind:user="user"
+                v-bind:followed="followed"
+                v-on:error="error"
+                v-on:success="freetSuccess"
             />
-            <input
-                type="button"
-                value="Refreet"
-                v-on:click="refreetHandler"
-            />
-        </div>
+            <div class="error" :style="{visibility: errorVis}">{{message}}</div>
+            <div v-bind:class="editorClass">
+                <section class="editHeader">
+                <label> {{ inputTitle }}</label>
+                    <div class="editOptions">
+                        <input type="button" value="Cancel" v-on:click="cancelHandler"/>
+                        <input type="button" :value="submitValue" v-on:click="submitHandler"/>
+                    </div>
+                </section>
+                <textarea v-model="content"/>
+                
+            </div>
+            <div v-bind:class="actionsClass">
+                <h4 class="votes">
+                    <!-- update to be dynamic with upvotes on actual freet-->
+                    {{ freet.upvotes }}
+                </h4>
+                <input
+                    class="voteButton"
+                    type="button"
+                    value="Upvote"
+                    v-bind:class="voteClass"
+                    v-on:click="upvoteHandler"
+                />
+                <input
+                    type="button"
+                    value="Refreet"
+                    v-on:click="refreetHandler"
+                />
+            </div>
     </li>
 </template>
 
 <script src="../../public/services.js"></script>
 <script>
+    import ParentFreet from './ParentFreet.vue';
     export default {
         name: 'Freet',
-        props: ['freet', 'user', 'followed'],
+        props: ['freet', 'user', 'followed', 'parentID', 'upvotes'],
+        components: {ParentFreet},
         data() {
             return {
                 content: '',
                 isEditing: false,
-                edit: false, // update
                 message: '', // holds error
                 optionsOpen: false,
-                upvotes: 0, // make property under freet
-                upvoteColor: '#3973ac',
+                voteClass: 'unvoted',
                 authorClass: 'notFollowed',
                 isFollowing: 'Not Following',
-                editorVis: 'hidden',
-                editorHeight: '0px',
-                inputTitle: 'Edit Content'
+                editorClass: 'hidden',
+                actionsClass: 'actions',
+                inputTitle: 'Edit Content',
+                submitHandler: this.editSubmit,
+                submitValue: 'Update',
+                parent: {
+                    id: null,
+                    content: null,
+                    author: null
+                }
             }
         },
         watch: {
+            parentID: function() {
+                if (this.parentID) {
+                    const fields = {
+                        id: this.parentID
+                    };
+                    viewFreetByID(fields, this.parentSuccess, this.parentError);
+                } else {
+                    this.parent = null;
+                }
+            },
             followed: function() {
-                console.log(this.followed);
                 if (this.followed.includes(this.freet.author)) {
                     this.authorClass= 'followed';
                     this.isFollowing='Following';
@@ -107,13 +122,29 @@
                     this.isFollowing='Not Following';
                 }
             },
+            upvotes: function() {
+                if (this.upvotes.includes(this.freet.id)) {
+                    this.voteClass = 'upvoted';
+                } else {
+                    this.voteClass = 'unvoted';
+                }
+            },
             isEditing: function() {
                 if (this.isEditing) {
-                    this.editorVis = 'visible';
-                    this.editorHeight = '150px';
+                    this.editorClass = 'editor';
+                    this.actionsClass = 'hidden';
                 } else {
-                    this.editorVis = 'hidden';
-                    this.editorHeight = '0px';
+                    this.editorClass = 'hidden';
+                    this.actionsClass = 'actions';
+                }
+            },
+            inputTitle: function() {
+                if (this.inputTitle == 'Edit Content') {
+                    this.submitHandler = this.editSubmit;
+                    this.submitValue = 'Update';
+                } else {
+                    this.submitHandler = this.refreetSubmit;
+                    this.submitValue = 'Post';
                 }
             }
         },
@@ -125,23 +156,10 @@
                 return this.optionsOpen ? 'visible' : 'hidden';
             },
             errorVis: function() {
-                return this.message.length>0 ? 'visible' : 'hidden'
+                return this.message.length>0 ? 'visible' : 'hidden';
             },
-            parent: function() {
-                if (this.freet.parentFreet) {
-                    return this.freet.parentFreet;
-                } else {
-                    return {
-                        id: '',
-                        author: ''
-                    };
-                }
-            },
-            parentClass: function() {
-                return this.freet.parentFreet ? 'visParent' : 'hidParent';
-            }
         },
-        mounted() {
+        beforeMount() {
             if (this.followed.includes(this.freet.author)) {
                 this.authorClass= 'followed';
                 this.isFollowing='Following';
@@ -149,92 +167,126 @@
                 this.authorClass= 'notFollowed';
                 this.isFollowing='Not Following';
             }
+            if (this.parentID) {
+                const fields = {
+                    id: this.parentID
+                };
+                viewFreetByID(fields, this.parentSuccess, this.parentError);
+            } else {
+                this.parent = null;
+            }
+            if (this.upvotes.includes(this.freet.id)) {
+                this.voteClass = 'upvoted';
+            } else {
+                this.voteClass = 'unvoted';
+            }
         },
         methods: {
-            optionsHandler() {
-                // update to prevent editing if upvotes/refreet
-                this.optionsOpen = !this.optionsOpen;
-                this.message = '';
-            },
-            editHandler() {
-                console.log(this.isEditing);
-                this.optionsHandler();
-                this.content = this.freet.content;
-                this.isEditing = true;
-                console.log(this.isEditing);
-            },
+            // event/state handlers
             cancelHandler() {
                 this.content = '';
-                this.error = '';
+                this.message = '';
                 this.isEditing = false;
-            },
-            updateHandler() {
-                const fields = {
-                    id: this.freet.id,
-                    content: this.content
-                };
-                editFreet(fields, this.edited, this.error);
             },
             deleteHandler() {
                 const fields = {
                     id: this.freet.id
                 }
-                deleteFreet(fields, this.deleted, this.error);
+                deleteFreet(fields, this.deleteSuccess, this.error);
+            },
+            editHandler() {
+                this.optionsHandler();
+                this.inputTitle = "Edit Content"
+                this.content = this.freet.content;
             },
             followHandler() {
                 const fields = {
                     author: this.freet.author
                 }
                 if (this.isFollowing == "Following") {
-                    removeAuthorFromFollowed(fields, this.follow, this.error);
+                    removeAuthorFromFollowed(fields, this.followSuccess, this.error);
                 } else {
-                    addAuthorToFollowed(fields, this.follow, this.error);
+                    addAuthorToFollowed(fields, this.followSuccess, this.error);
                 }
             },
-            upvoteHandler() {
-                // update to actually function outside of client screen
-                if (this.upvoteColor == '#3973ac') {
-                    this.upvoteColor = '#6699cc';
-                    this.upvotes += 1;
-                } else {
-                    this.upvoteColor = '#3973ac'
-                    this.upvotes -= 1;
-                }
+            optionsHandler() {
+                this.optionsOpen = !this.optionsOpen;
+                this.message = '';
             },
             refreetHandler() {
+                this.inputTitle = 'Add Comment';
+                this.content = '';
+                this.textHandler();
+            },
+            textHandler() {
+                this.isEditing = true;
+            },
+            upvoteHandler() {
                 const fields = {
-                    parent_id: this.freet.id,
-                    content: ''
+                    id: this.freet.id,
+                };
+                if (!this.upvotes.includes(this.freet.id)) { 
+                    this.voteClass = 'upvoted';
+                    upvoteFreet(fields, this.voteSuccess, this.error);
+                } else {
+                    this.voteClass = 'unvoted';
+                    unvoteFreet(fields, this.voteSuccess,this.error)
+                }
+            },
+            // form submitting
+            editSubmit() {
+                const fields = {
+                    id: this.freet.id,
+                    content: this.content
+                };
+                editFreet(fields, this.editSuccess, this.error);
+            },
+            refreetSubmit() {
+                const fields = {
+                    id: this.freet.id,
+                    content: this.content
                 };
                 refreetFreet(fields, this.freetSuccess, this.error);
             },
-            parentHandler() {
-                const fields = {
-                    id: this.freet.parentFreet.id
-                };
-                viewFreetByID(fields, this.freetSuccess, this.error);
-            },
-            follow(obj) {
-                this.error = '';
-                this.$emit('updateFollowed', obj);
-            },
-            edited(obj) {
-                this.error = '';
-                this.$emit('edit', obj);
-                this.cancelHandler();
-            },
-            deleted(obj) {
+            // success callbacks
+            deleteSuccess(obj) {
                 //update to do something about refreets
                 this.optionsHandler();
                 this.$emit('delete', obj);
             },
-            error(obj) {
-                this.message = obj.data.error;
+            editSuccess(obj) {
+                this.message = '';
+                this.$emit('edit', obj);
+                this.cancelHandler();
+            },
+            followSuccess(obj) {
+                this.message = '';
+                this.$emit('updateFollowed', obj);
             },
             freetSuccess(obj) {
                 const message = obj.data.msg;
                 const freets = obj.data.freets;
                 this.$emit('success', message, freets);
+                this.cancelHandler();
+            },
+            parentSuccess(obj) {
+                this.message = '';
+                this.parent = obj.data.freets[0];
+            },
+            voteSuccess(obj) { 
+                this.message = '';
+                this.$emit('vote', obj) 
+            },
+            // error callbacks
+            error(obj) {
+                this.message = obj.data.error;
+            },
+            parentError(obj) {
+                this.parent = {
+                    author: null,
+                    content: null,
+                    id: this.parentID,
+                }  
             }
         }
     }
@@ -281,12 +333,26 @@
     }
 
     .visParent {
-        visibility: 'visible';
+        visibility: visible;
         height: 20px;
+        background-color: var(--darkblue);
+    }
+
+    .visParent:hover {
+        background-color: var(--blue);
     }
 
     .hidParent {
-        visibility: 'hidden';
+        visibility: hidden;
+        height: 0px;
+    }
+
+    .editor {
+        height: 150px;
+    }
+
+    .hidden {
+        visibility: hidden;
         height: 0px;
     }
 
@@ -464,6 +530,17 @@ h4 {
   padding-left: 3.5%;
 }
 
+.upvoted {
+    background-color: var(--blue) !important;
+}
+
+.unvoted {
+    background-color: var(--darkblue) !important;
+}
+
+.unvoted:hover, .upvoted:hover {
+    background-color: var(--offblue) !important;
+}
 
 input {
     border: none;
@@ -471,7 +548,7 @@ input {
 }
 
 input[type="button"] {
-    background-color: var(--darkblue);
+    background-color: var(--blue);
     color: white;
     padding: 10px;
     margin: 4px;

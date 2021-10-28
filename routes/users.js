@@ -153,6 +153,29 @@ router.get(
 )
 
 /**
+ * Gets an array of freet ids of the freets the user has upvoted.
+ * 
+ * @id GET api/users/upvoted
+ * 
+ * @return  {string[]} - an array of freet ids
+ * @throws  {403} - if the user isn't logged in
+ */
+ router.get(
+    '/upvoted',
+    [
+        validateThat.userIsLoggedIn
+    ],
+    (req, res) => {
+        let upvotes = Users.getUserUpvotes(req.session.user_id);
+        let msg = {
+            msg: "Here are the ids of freet you've upvoted.",
+            upvotes: upvotes
+        };
+        res.status(200).json(msg);
+    }
+)
+
+/**
  * Adds an author to user's followed.
  * 
  * @id PUT api/users/followed
@@ -188,9 +211,10 @@ router.put(
     '/followed/:author?',
     [
         validateThat.userIsLoggedIn,
+        validateThat.authorExists
     ],
     (req, res) => {
-        let followed = Users.removeAuthorFromFollowed(req.session.user_id, req.body.author);
+        let followed = Users.removeAuthorFromFollowed(req.session.user_id, req.params.author);
         let msg = {
             msg: "Here is an updated array of who you follow.",
             followed: followed
@@ -214,8 +238,8 @@ router.delete(
         validateThat.userIsLoggedIn,
     ],
     (req, res) => {
-        Users.deleteUser(req.session.user_id);
         Freets.deleteFreetsByAuthor(req.session.user_id);
+        Users.deleteUser(req.session.user_id);
         req.session.user_id = null;
         let msg = "User deleted.";
         res.status(200).json(msg);

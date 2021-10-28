@@ -1,3 +1,5 @@
+const Freets = require('../models/Freets');
+
 let users = [];
 let id_num = 0;
 
@@ -29,11 +31,13 @@ class Users {
     static addUser(username, password) {
         const user_id = id_num.toString();
         const following = [];
+        const upvotes = [];
         const user = {
             user_id, 
             username, 
             password,
-            following
+            following,
+            upvotes
         };
         id_num += 1;
         users.push(user);
@@ -47,6 +51,9 @@ class Users {
      */
     static deleteUser(user_id) {
         const user = this.findUserByID(user_id);
+        for (let i = 0; i < user.upvotes.length; i++) {
+            Freets.unvote(user.upvotes[i]);
+        }
         users = users.filter(u => u !== user);
     }
 
@@ -117,7 +124,7 @@ class Users {
      * @param   {string} author_name   - the username of the author to remove
      * @return  {string[]} - an updated array of usernames of followed authors
      */
-    static removeAuthorToFollowed(user_id, author_name) {
+    static removeAuthorFromFollowed(user_id, author_name) {
         const author = Users.findUser(author_name);
         const user = Users.findUserByID(user_id);
         user.following = user.following.filter(u => u.username !== author_name);
@@ -137,26 +144,42 @@ class Users {
     }
 
     /**
-     * Add upvoted freet to list 
+     * Get an array of ids of the freets the user has upvoted.
      * 
-     * @param   {string} freet_id       - the freet_id of the freet that was upvoted 
-     * @return  {string[]} - an array of upvoted freets
+     * @param   {string} user_id       - the user_id of the user account
+     * @return  {string[]} - an array of freet ids
      */
-     static addUpvotedFreet(freet_id) {
-        upvotes.push(freet_id); 
+    static getUserUpvotes(user_id) {
+        const user = Users.findUserByID(user_id);
+        const upvotes = user.upvotes;
         return upvotes;
     }
 
-     /**
-     * Delete upvoted freet from list 
+    /**
+     * Add upvoted freet to list 
      * 
-     * @param   {string} freet_id       - the freet_id of the freet that was upvoted 
-     * @return  {string[]} - an array of upvoted freets
+     * @param   {string} user_id    - the user_id of the freet that was upvoted 
+     * @param   {string} freet_id   - the freet_id of the freet that was upvoted 
+     * @return  {Freet} - upvoted Freet
      */
-      static removeUpvotedFreet(freet_id) {
-        
-        upvotes.delete(freet_id);
-        return upvotes; 
+     static addUpvotedFreet(user_id,freet_id) {
+        const user = Users.findUserByID(user_id);
+        user.upvotes.push(freet_id); 
+        const freet = Freets.upvote(freet_id);
+        return freet; 
+    }
+
+    /**
+     * Delete upvoted freet from list 
+     * @param   {string} user_id       - the user_id of user that upvoted a freet 
+     * @param   {string} freet_id       - the freet_id of the freet that was devoted 
+     * @return  {Freet} - unvoted Freet
+     */
+     static removeUpvotedFreet(user_id,freet_id) {
+        const user = Users.findUserByID(user_id);
+        user.upvotes = user.upvotes.filter(id => id !== freet_id);
+        const freet = Freets.unvote(freet_id); 
+        return freet;
     }
 }
 

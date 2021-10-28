@@ -1,7 +1,10 @@
 <template>
-    <main id="app">
+    <main id="app" v-cloak>
       <header class="topbar">
-        <h1 v-on:click="homeHandler">Fritter</h1>
+        <img class="logo" src="./assets/fritter.png"/>
+        <h1 v-on:click="homeHandler">
+          Fritter
+        </h1>
         <UserOptions
             v-bind:isLoggedIn="isLoggedIn"
             v-bind:vis="vis"
@@ -21,18 +24,20 @@
           v-bind:isLoggedIn="isLoggedIn"
           v-bind:vis="vis"
           v-bind:user="user"
-          v-bind:authors="followed"
-          v-on:freetHandler="freetHandler"
-          v-on:errorHandler="errorHandler"
+          v-bind:followed="followed"
+          v-on:freetHandler="success"
+          v-on:errorHandler="error"
         />
         <Response 
           v-bind:response="responseProps" 
           v-bind:followed="followed"
+          v-bind:upvotes="upvotes"
           v-bind:user="user"
           v-on:delete="deleteHandler"
           v-on:edit="editHandler"
           v-on:followedHandler="followedHandler"
           v-on:freetHandler="freetHandler"
+          v-on:vote="voteHandler"
         />
       </span>
     </main>
@@ -56,7 +61,8 @@
                 isLoggedIn: false,
                 user: '',
                 follow: true,
-                followed: []
+                followed: [],
+                upvotes: []
             }
         },
         computed: {
@@ -71,17 +77,19 @@
           if (localStorage.user) {
             this.isLoggedIn = true;
             this.user = localStorage.user;
+            const fields = {};
+            getFollowedAuthors(fields, this.loginSuccess, this.error);
           }
           if (localStorage.lastCall) {
             if (this.user != '') {
               switch (localStorage.lastCall) {
                 case 'all':
-                  const fields = {}
+                  let fields = {}
                   viewAllFreets(fields, this.success, this.error);
                   break;
                 case 'author':
                   if (localStorage.author) {
-                    const fields = {
+                    let fields = {
                       author: localStorage.author
                     }
                     viewFreetsByAuthor(fields, this.success, this.error);
@@ -89,6 +97,10 @@
                     localStorage.lastCall = 'home';
                     this.homeHandler();
                   }
+                  break;
+                case 'all followed':
+                  fields = {};
+                  viewFreetsByFollowedAuthors(fields, this.success, this.error);
                   break;
                 default:
                   localStorage.lastCall = 'home';
@@ -104,11 +116,13 @@
             isLoggedIn: function() {
                 if (this.isLoggedIn) {
                     // get followed authors
+                    this.followed = [];
+                    this.upvotes = [];
                     const fields = {};
-                    getFollowedAuthors(fields, this.followingSuccess, this.error);
+                    getFollowedAuthors(fields, this.loginSuccess, this.error);
                 } else {
-                    this.authors = [];
-                    this.$emit('followed', this.authors);
+                    this.followed = [];
+                    this.upvotes - [];
                 }
             }
         },
@@ -161,11 +175,32 @@
               }
               this.responseProps.freets = freets;
             },
+            voteHandler(obj){
+              const freets = this.responseProps.freets;
+              const id = obj.data.freets[0].id;
+              for (let i = 0; i < freets.length; i++) {
+                if (freets[i].id == id) {
+                  freets[i] = obj.data.freets[0];
+                  break;
+                }
+              }
+              this.responseProps.freets = freets;
+              const fields = {};
+              getUpvotes(fields, this.upvotesSuccess, this.error);
+            },
             followedHandler(authors) {
               this.followed = authors;
             },
             followingSuccess(obj) {
-                this.followed = obj.data.followed;
+              this.followed = obj.data.followed;
+            },
+            upvotesSuccess(obj) {
+              this.upvotes = obj.data.upvotes;
+            },
+            loginSuccess(obj) {
+              this.followed = obj.data.followed;
+              const fields = {};
+              getUpvotes(fields, this.upvotesSuccess, this.error);
             },
             error(obj) {
               if (obj.status==403) {
@@ -173,13 +208,13 @@
                 if (this.isLoggedIn) {
                   // logged out on server, but logged in on client-side
                   // update client-side to logged in
-                  this.user = '';
-                  this.sessionHandler(false, obj.data.error, this.user);
+                  const user = '';
+                  this.sessionHandler(false, obj.data.error, user);
                 } else {
                   // logged out on client-side, but logged in on server
                   // update client-side to logged out
-                  this.user = obj.data.user;
-                  this.sessionHandler(true, obj.data.error, this.user);
+                  const user = obj.data.user;
+                  this.sessionHandler(true, obj.data.error, user);
                 }
                 this.homeHandler();
               } else {
@@ -188,15 +223,7 @@
               }
             },
             success(obj) {
-              let freets = [];
-              // create properties for each freet
-              for (let [key, value] of Object.entries(obj.data.freets)) {
-                  freets.push({
-                      id: value.id,
-                      content: value.content,
-                      author: value.author
-                  });
-              };
+              let freets = obj.data.freets;
               // sort freets by id (greatest -> smallest), so most recent freets displayed first
               freets.sort((a, b) => (parseInt(a.id) < parseInt(b.id)) ? 1 : -1);
               this.responseProps = {
@@ -223,9 +250,10 @@
   /* text-align: center; */
   color: #2c3e50;
   --std-color: #2c3e50;
-  --darkblue:  #3973ac;
-  --blue:      #6699cc;
-  --lightblue: #9fbfdf;
+  --darkblue:  #6F8FBA;
+  --blue:      #8EB1D9;
+  --offblue:   #ADC4DD;
+  --lightblue: #CAD5E3;
   --stdheight: 34px;
   display: flex;
   flex-direction: column;
@@ -238,7 +266,7 @@ input {
 }
 
 input[type="button"] {
-  background-color: var(--blue);
+  background-color: var(--darkblue);
   color: white;
   padding: 10px;
   margin: 6px;
@@ -248,7 +276,7 @@ input[type="button"] {
 
 input[type="button"]:hover {
     cursor: pointer;
-    background-color: var(--lightblue);
+    background-color: var(--offblue);
 }
 
 input[type="button"]:focus {
@@ -259,9 +287,9 @@ input[type="button"]:focus {
   display: inline-flex;
   width: calc(100% - 10px);
   justify-content: space-between;
-  background-color: var(--darkblue);
+  background-color: var(--blue);
   border-bottom: solid;
-  border-color: var(--blue);
+  border-color: var(--darkblue);
   padding: 7px;
   padding-left: 5px;
   padding-right: 5px;
@@ -269,11 +297,12 @@ input[type="button"]:focus {
 }
 
 h1 {
-  margin-top: auto;
-  margin-bottom: auto;
+  margin-top: 5px;
+  margin-bottom: 5px;
   padding-left: 5px;
   color: white;
   font-weight: normal;
+  margin-right: auto;
 }
 
 h1:hover {
@@ -290,5 +319,11 @@ h1:hover {
 html, body, #app {
   height: 100vh;
   margin: 0px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  margin-left: 5px;
 }
 </style>

@@ -100,7 +100,6 @@
                     this.dropdown = AccountSettings;
                 }
                 if (this.form == 'hidden' || this.button1 == 'openForm') {
-                    this.dropdown = CredentialsForm;
                     this.$refs.form.closeHandler();
                     this.form = 'visible';
                     this.button2 = 'openForm';
@@ -219,15 +218,19 @@
 
     .openForm input {
         border-radius: 4px 4px 0px 0px;
-        background-color: var(--blue);
-    }
-
-    .openForm input:hover + div {
         background-color: var(--lightblue);
     }
 
+    .openForm input:hover + div {
+        background-color: var(--offblue);
+    }
+
+    .openForm input:hover {
+        background-color: var(--offblue);
+    }
+
     .openForm div {
-        background-color: var(--blue);
+        background-color: var(--lightblue);
         color: var(--blue);
         margin-left: 6px;
         margin-right: 6px;
@@ -237,7 +240,7 @@
 
     .closedForm input {
         border-radius: 4px 4px 4px 4px;
-        background-color: var(--blue);
+        background-color: var(--darkblue);
     }
 
     .closedForm div {
@@ -262,14 +265,6 @@
 
     .button2 {
         width: 130px;
-    }
-
-    .formbutton {
-        margin: 0px !important;
-    }
-
-    .formbutton:hover {
-        background-color: var(--lightblue) !important;
     }
 
     .close {

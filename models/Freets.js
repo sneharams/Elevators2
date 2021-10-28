@@ -13,7 +13,7 @@ let id_num = 0;
  * @prop {string} id      - id of the freet
  * @prop {string} content - the content of the freet
  * @prop {string} author  - username of the author
- * @prop {Freet} parentFreet - parent freet (null if original freet)
+ * @prop {Freet} parent_id - parent freet id (null if original freet)
  * @prop {int} upvotes - number of upvotes of freet >=0 
  */
 
@@ -35,26 +35,40 @@ class Freets {
    */
   static addOne(content, author, user_id) {
     const id = id_num.toString();
-    const freet = {id, content, author};
-    const parentFreet = null;
+    const parent_id = null;
     const upvotes = 0;
-    const freet_obj = {id, user_id, freet, parentFreet,upvotes};
+    const freet = {id, content, author, parent_id, upvotes};
+    const freet_obj = {id, user_id, freet};
     id_num = id_num + 1;
     data.push(freet_obj);
     return freet_obj.freet;
   }
 
   /**
-   * Add a freet to the collection.
-   * 
-   * @param  {string} content - the content of the freet
-   * @param  {string} author  - the username of the author
-   * @param  {string} user_id - the user_id of the author
-   * @return {int} - upvotes
+   * Increase upvote counter
+   * @param  {string} freet_id - the freet_id of the freet that was upvoted 
+   * @return {Freet} - upvoted freet
    */ 
-   static upvote() { 
-    upvotes = upvotes + 1;
-    return upvotes;
+  static upvote(freet_id) { 
+    const freet = Freets.findOne(freet_id);
+    freet.upvotes += 1;
+    return freet;  
+  }
+
+  /**
+   * Decrease upvote counter
+   * @param  {string} freet_id - the freet_id of the freet that was upvoted 
+   * @return {Freet | undefined} - unvoted freet (only could be undefined if called from backend when user is deleted and upvotes removed)
+   */ 
+  static unvote(freet_id) { 
+    const freet = Freets.findOne(freet_id);
+    // Since this is called when a user is deleted, and their upvotes are removed,
+    // there may be freet ids they upvoted that have since been deleted, and this
+    // wouldn't be checked by middleware since it's called from backend.
+    if (freet) {
+      freet.upvotes -= 1;
+    }
+    return freet;  
   }
 
 
@@ -112,7 +126,7 @@ class Freets {
    */
   static updateOne(id, content) {
     const freet = Freets.findOne(id);
-    freet.content = content;
+    freet.content = content + " (edited)";
     return freet;
   }
 
@@ -163,8 +177,8 @@ class Freets {
   static refreet(content, author, user_id, parent_id) {
     const id = id_num.toString();
     const upvotes = 0; 
-    const parentFreet = Freets.findOne(parent_id); 
-    const freet = {id, content, author, parentFreet, upvotes};
+    // const parent = Freets.findOne(parent_id); 
+    const freet = {id, content, author, parent_id, upvotes};
     const freet_obj = {id, user_id, freet}; 
     id_num = id_num + 1; 
     data.push(freet_obj);

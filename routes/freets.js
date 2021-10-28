@@ -39,7 +39,7 @@ router.get(
     (req, res) => {
         const author = req.params.author;
         const msg = {
-            msg: `Freets by author: ${author}`,
+            msg: `Freets by Author: ${author}`,
             freets: Freets.findAllByAuthor(author)
         }
         res.status(200).json(msg).end();
@@ -62,7 +62,7 @@ router.get(
         const followed = Users.getUserFollowed(req.session.user_id);
         const freets = Freets.findAll().filter(freet => followed.includes(freet.author));
         const msg = {
-            msg: `Freets by followed authors.`,
+            msg: `Freets by Followed Authors`,
             freets: freets
         }
         res.status(200).json(msg).end();
@@ -150,25 +150,74 @@ router.delete(
  * 
  * @id Get api/freets/id/:id
  * 
- * @return {Freets[]} - the deleted freet in an array
- * @throws {403} - if the user isn't logged in or if the freet isn't authored by the logged in user
+ * @return {Freets[]} - the freet in an array
  * @throws {404} - if the freet does not exist
  */
 router.get(
     '/id/:id?',
     [
-        validateThat.userIsLoggedIn,
         validateThat.freetExists,
-        validateThat.freetIsByUser
     ],
     (req, res) => {
         const freet = Freets.findOne(req.params.id);
         const msg = {
-            msg: `Freet with ID: ${req.params.id}.`,
+            msg: `Freet with ID: ${req.params.id}`,
             freets: [freet]
         }
         res.status(200).json(msg).end();
 });   
+
+
+/**
+ * Upvote a freet.
+ * 
+ * @id put api/freets/upvote_id/:id?
+ * @return {Freets []} - the users that upvoted freet_id 
+ * @throws {403} - if the user isn't logged in or if the freet isn't authored by the logged in user
+ * @throws {404} - if the freet does not exist
+ * @throws {409} - if the freet was already upvoted
+ */
+ router.put(
+    '/upvote_id/:id?',
+    [
+        validateThat.userIsLoggedIn,
+        validateThat.freetExists,
+        validateThat.freetIsNotUpvoted
+    ], 
+    (req, res) => {
+        const freet = Users.addUpvotedFreet(req.session.user_id, req.params.id);
+        const msg = { 
+            msg: `Freet with ID: ${req.params.id} has been upvoted!`,
+            freets: [freet] 
+        }
+        res.status(200).json(msg).end();
+});  
+
+/**
+ * Unvote a freet.
+ * 
+ * @id delete api/freets/upvote_id/:id?
+ * @return {Freets []} - the users that upvoted freet_id 
+ * @throws {403} - if the user isn't logged in or if the freet isn't authored by the logged in user
+ * @throws {404} - if the freet does not exist
+ * @throws {409} - if the freet wasn't upvoted previously
+ */
+ router.delete(
+    '/upvote_id/:id?',
+    [
+        validateThat.userIsLoggedIn,
+        validateThat.freetExists,
+        validateThat.freetIsUpvoted
+    ], 
+    (req, res) => {
+        const freet = Users.removeUpvotedFreet(req.session.user_id, req.params.id);
+        const msg = { 
+            msg: `Freet with ID: ${req.params.id} has been un-upvoted!`,
+            freets: [freet] 
+        }
+        res.status(200).json(msg).end();
+});  
+
 
 /**
  * Refreet a freet.
@@ -181,7 +230,7 @@ router.get(
  * @throws {403} - if the user isn't logged in
  */ 
  router.post( 
-    '/id/:parent_id?', 
+    '/id/:id?', 
     [
         validateThat.userIsLoggedIn,
         validateThat.freetTextIsWithinLimit,
@@ -189,7 +238,7 @@ router.get(
     ], 
     (req, res) => {
         const creator = Users.findUserByID(req.session.user_id).username;
-        const freet = Freets.refreet(req.body.content, creator, req.session.user_id, req.params.parent_id);
+        const freet = Freets.refreet(req.body.content, creator, req.session.user_id, req.params.id);
         const msg = { 
             msg: "Freet successfully refreeted!",
             freets: [freet]

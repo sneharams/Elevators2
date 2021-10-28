@@ -65,13 +65,19 @@ function addAuthorToFollowed(fields, callbackSuccess, callbackFailure) {
 }
 
 function removeAuthorFromFollowed(fields, callbackSuccess, callbackFailure) {
-  axios.delete('/api/users/followed', fields)
+  axios.delete('/api/users/followed/' + fields.author, fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
 
 function getFollowedAuthors(fields, callbackSuccess, callbackFailure) {
   axios.get('/api/users/followed', fields)
+    .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
+    .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
+}
+
+function getUpvotes(fields, callbackSuccess, callbackFailure) {
+  axios.get('/api/users/upvoted', fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
@@ -125,7 +131,7 @@ function createFreet(fields, callbackSuccess, callbackFailure) {
 }
 
 function refreetFreet(fields, callbackSuccess, callbackFailure) {
-  axios.post('/api/freets/id/' + fields.parent_id, fields)
+  axios.post('/api/freets/id/' + fields.id, fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
@@ -141,6 +147,19 @@ function deleteFreet(fields, callbackSuccess, callbackFailure) {
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
+
+function upvoteFreet(fields, callbackSuccess, callbackFailure) {
+  axios.put('/api/freets/upvote_id/' + fields.id , fields)
+    .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
+    .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
+}
+
+function unvoteFreet(fields, callbackSuccess, callbackFailure) {
+  axios.delete('/api/freets/upvote_id/' + fields.id , fields)
+    .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
+    .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
+}
+
 
 
 // Map form (by id) to the function that should be called on submit

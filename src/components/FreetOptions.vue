@@ -80,6 +80,14 @@
         margin-left: 10px !important;
     }
 
+    input[type="button"] {
+        background-color: var(--blue) !important;
+    }
+
+    input[type="button"]:hover {
+        background-color: var(--offblue) !important;
+    }
+
     .allButton {
         width: 140px !important;
     }
