@@ -190,6 +190,7 @@ const authorIsFollowed = (req, res, next) => {
         }).end();
         return;
     }
+    next();
 }
 
 const authorIsNotFollowed = (req, res, next) => {
@@ -200,6 +201,7 @@ const authorIsNotFollowed = (req, res, next) => {
         }).end();
         return;
     }
+    next();
 }
 
 

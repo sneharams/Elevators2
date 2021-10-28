@@ -49,7 +49,7 @@
                 v-on:error="error"
                 v-on:success="freetSuccess"
             />
-            <div class="error" v-if="message.length > 0">{{message}}</div>
+            <div class="error" v-if="messageIf">{{message}}</div>
             <div class="editor" v-if="isEditing">
                 <section class="editHeader">
                 <label> {{ inputTitle }}</label>
@@ -157,6 +157,12 @@
         computed: {
             optionsButton: function() {
                 return this.optionsOpen ? 'x' : ':';
+            },
+            messageIf: function() {
+                if (this.message && this.message.length > 0) {
+                    return true;
+                }
+                return false;
             }
         },
         beforeMount() {
