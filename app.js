@@ -3,10 +3,12 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const session = require('express-session');
-
+require('dotenv').config();
+const isProduction = process.env.NODE_ENV === 'production';
 const indexRouter = require('./routes/index');
 const userRouter = require('./routes/users');
 const freetsRouter = require('./routes/freets');
+const history = require('connect-history-api-fallback');
 
 const app = express();
 
@@ -21,7 +23,8 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, isProduction ? 'dist' : 'public')));
+app.use(history());
 
 app.use('/', indexRouter);
 app.use('/api/users', userRouter);
