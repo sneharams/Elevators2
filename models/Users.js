@@ -8,8 +8,8 @@ let id_num = 0;
  * @prop {string} user_id  - user_id for account
  * @prop {string} username - username for account
  * @prop {string} password - password for account
- * @prop {array} following - users that account follows
- * @prop {array} upvotes - all freets that user has liked 
+ * @prop {User[]} following - users that account follows
+ * @prop {string[]} upvotes - all freets that user has liked 
 
  */
 
@@ -107,11 +107,11 @@ class Users {
      * Add an authors to user's following array.
      * 
      * @param   {string} user_id       - the user_id of the user account
-     * @param   {string} author_name   - the username of the author to follow
-     * @return  {string[]} - an updated array of usernames of followed authors
+     * @param   {string} author_id     - the id of the author to follow
+     * @return  {User[]} - an updated array of followed authors
      */
-    static addAuthorToFollowed(user_id, author_name) {
-        const author = Users.findUser(author_name);
+    static addAuthorToFollowed(user_id, author_id) {
+        const author = Users.findUserByID(author_id);
         const user = Users.findUserByID(user_id);
         user.following.push(author);
         return Users.getUserFollowed(user_id);
@@ -121,35 +121,34 @@ class Users {
      * Remove an authors from the user's following array.
      * 
      * @param   {string} user_id       - the user_id of the user account
-     * @param   {string} author_name   - the username of the author to remove
-     * @return  {string[]} - an updated array of usernames of followed authors
+     * @param   {string} author_id     - the id of the author to remove
+     * @return  {User[]} - an updated array of followed authors
      */
-    static removeAuthorFromFollowed(user_id, author_name) {
-        const author = Users.findUser(author_name);
+    static removeAuthorFromFollowed(user_id, author_id) {
+        const author = Users.findUserByID(author_id);
         const user = Users.findUserByID(user_id);
-        user.following = user.following.filter(u => u.username !== author_name);
+        user.following = user.following.filter(u => u.username !== author.username);
         return Users.getUserFollowed(user_id);
     }
 
     /**
      * Get an array of the authors the user is following.
+     * Updates the following list to remove deleted users.
      * 
      * @param   {string} user_id       - the user_id of the user account
-     * @return  {string[]} - an array of usernames of followed authors
+     * @return  {User[]} - an array of followed authors
      */
     static getUserFollowed(user_id) {
         const user = Users.findUserByID(user_id);
         let following = [];
-        let names = [];
         for (let i = 0; i < user.following.length; i++) {
-            const author = Users.findUserByID(user.following[i].id);
+            const author = Users.findUserByID(user.following[i].user_id);
             if (author) {
                 following.push(author);
-                names.push(author.username);
             }
         }
         user.following = following;
-        return names;
+        return user.following;
     }
 
     /**

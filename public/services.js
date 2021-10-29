@@ -48,13 +48,13 @@ function changePassword(fields, callbackSuccess, callbackFailure) {
 }
 
 function addAuthorToFollowed(fields, callbackSuccess, callbackFailure) {
-  axios.put('/api/users/followed/' + fields.author, fields)
+  axios.put('/api/users/followed/' + fields.author_id, fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
 
 function removeAuthorFromFollowed(fields, callbackSuccess, callbackFailure) {
-  axios.delete('/api/users/followed/' + fields.author, fields)
+  axios.delete('/api/users/followed/' + fields.author_id, fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }

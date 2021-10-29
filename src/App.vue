@@ -24,13 +24,14 @@
           v-bind:isLoggedIn="isLoggedIn"
           v-bind:user="user"
           v-bind:followed="followed"
+          v-bind:followedIDs="followedIDs"
           v-on:freetHandler="success"
           v-on:errorHandler="error"
         />
         <Response 
           v-bind:key="refresh"
           v-bind:response="responseProps" 
-          v-bind:followed="followed"
+          v-bind:followedIDs="followedIDs"
           v-bind:upvotes="upvotes"
           v-bind:user="user"
           v-on:delete="deleteHandler"
@@ -68,7 +69,8 @@
                 isLoggedIn: false,
                 user: '',
                 follow: true,
-                followed: [],
+                followed: [],     // {user_id, username}[] for each author
+                followedIDs: [],  // string[]
                 upvotes: [],
                 refresh: 0,
                 sortType: 1,
@@ -128,11 +130,13 @@
                 if (this.isLoggedIn) {
                     // get followed authors
                     this.followed = [];
+                    this.followedIDs = [];
                     this.upvotes = [];
                     const fields = {};
                     getFollowedAuthors(fields, this.loginSuccess, this.error);
                 } else {
                     this.followed = [];
+                    this.followedIDs = [];
                     this.upvotes - [];
                 }
             }
@@ -201,8 +205,9 @@
               const fields = {};
               getUpvotes(fields, this.upvotesSuccess, this.error);
             },
-            followedHandler(authors) {
+            followedHandler(authors, authorIDs) {
               this.followed = authors;
+              this.followedIDs = authorIDs;
             },
             sortHandler(type) {
               let freets = this.responseProps.freets;
@@ -230,12 +235,14 @@
             },
             followingSuccess(obj) {
               this.followed = obj.data.followed;
+              this.followedIDs = obj.data.followed_ids;
             },
             upvotesSuccess(obj) {
               this.upvotes = obj.data.upvotes;
             },
             loginSuccess(obj) {
               this.followed = obj.data.followed;
+              this.followedIDs = obj.data.followed_ids;
               const fields = {};
               getUpvotes(fields, this.upvotesSuccess, this.error);
             },

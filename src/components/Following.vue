@@ -7,7 +7,8 @@
             <AuthorButton
                 v-for="author in followed"
                 v-bind:author="author"
-                v-bind:key="author"
+                v-bind:authorName="author.username"
+                v-bind:key="author.user_id"
                 v-on:authorHandler="authorHandler"
             />
         </div>
@@ -57,13 +58,12 @@
         },
         methods: {
             authorHandler(author) {
-                const authorText = author;
                 const fields = {
-                    author: authorText
+                    author_id: author.user_id
                 }
                 viewFreetsByAuthor(fields, this.success, this.error);
                 localStorage.lastCall = 'author';
-                localStorage.author = authorText;
+                localStorage.author = author.username;
             },
             allHandler() {
                 const fields = {};

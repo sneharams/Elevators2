@@ -144,9 +144,15 @@ router.get(
     ],
     (req, res) => {
         let followed = Users.getUserFollowed(req.session.user_id);
+        let followed_ids = followed.map(author => author.user_id);
+        let followed_objs = [];
+        followed.forEach(author => {
+            followed_objs.push({ user_id: author.user_id, username: author.username });
+        });
         let msg = {
             msg: "Here are who you follow.",
-            followed: followed
+            followed: followed_objs,
+            followed_ids: followed_ids
         };
         res.status(200).json(msg);
     }
@@ -178,7 +184,7 @@ router.get(
 /**
  * Adds an author to user's followed.
  * 
- * @id PUT api/users/followed
+ * @id PUT api/users/followed/:author_id
  * 
  * @return  {string[]} - an array of usernames of authors
  * @throws  {403} - if the user isn't logged in
@@ -186,17 +192,23 @@ router.get(
  * @throws  {409} - if the author is already followed
  */
 router.put(
-    '/followed/:author?',
+    '/followed/:author_id',
     [
         validateThat.userIsLoggedIn,
-        validateThat.authorExists,
+        validateThat.authorIDExists,
         validateThat.authorIsNotFollowed
     ],
     (req, res) => {
-        let followed = Users.addAuthorToFollowed(req.session.user_id, req.params.author);
+        let followed = Users.addAuthorToFollowed(req.session.user_id, req.params.author_id);
+        let followed_ids = followed.map(author => author.user_id);
+        let followed_objs = [];
+        followed.forEach(author => {
+            followed_objs.push({ user_id: author.user_id, username: author.username });
+        });
         let msg = {
             msg: "Here is an updated array of who you follow.",
-            followed: followed
+            followed: followed_objs,
+            followed_ids: followed_ids
         };
         res.status(200).json(msg);
     }
@@ -205,7 +217,7 @@ router.put(
 /**
  * Remove an author from user's followed.
  * 
- * @id DELETE api/users/followed
+ * @id DELETE api/users/followed/:author_id
  * 
  * @return  {string[]} - an array of usernames of authors
  * @throws  {403} - if the user isn't logged in
@@ -213,17 +225,23 @@ router.put(
  * @throws  {409} - if the author isn't already followed
  */
  router.delete(
-    '/followed/:author?',
+    '/followed/:author_id',
     [
         validateThat.userIsLoggedIn,
-        validateThat.authorExists,
+        validateThat.authorIDExists,
         validateThat.authorIsFollowed
     ],
     (req, res) => {
-        let followed = Users.removeAuthorFromFollowed(req.session.user_id, req.params.author);
+        let followed = Users.removeAuthorFromFollowed(req.session.user_id, req.params.author_id);
+        let followed_ids = followed.map(author => author.user_id);
+        let followed_objs = [];
+        followed.forEach(author => {
+            followed_objs.push({ user_id: author.user_id, username: author.username });
+        });
         let msg = {
             msg: "Here is an updated array of who you follow.",
-            followed: followed
+            followed: followed_objs,
+            followed_ids: followed_ids
         };
         res.status(200).json(msg);
     }

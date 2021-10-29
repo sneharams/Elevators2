@@ -2,11 +2,11 @@
     <div class="borderbox" v-bind:class="overlay" v-on:click="parentHandler">
             <span class="header">    
                 <div class="author">
-                    <button v-bind:class="authorClass">
+                    <h4 v-bind:class="authorClass">
                         <img class="icon" src="../assets/profile.png"/>
                         {{ author }}
                         
-                    </button>
+                    </h4>
                     <div v-if="author==null" class="placeholderShort"/>
                 </div>
                 <section class="end">
@@ -15,7 +15,7 @@
                     </h4></div>
                 </section>
             </span>
-            <div class="content">{{ content }}
+            <div class="content">{{ content }} {{ edited }}
                 <div v-if="author==null" class="placeholderLong"/>
                 <div v-if="author==null" class="placeholderLong"/>
                 <div v-if="author==null" class="placeholderShort"/>
@@ -27,7 +27,7 @@
 <script>
     export default {
         name: 'ParentFreet',
-        props: ['author', 'content', 'id', 'user', 'followed'],
+        props: ['author', 'content', 'id', 'user', 'followedIDs', 'edited', 'authorID'],
         data() {
             return {
                 authorClass: 'notFollowedParent',
@@ -35,9 +35,9 @@
             }
         },
         watch: {
-            followed: function() {
+            followedIDs: function() {
                 if (this.author) {
-                    if (this.followed.includes(this.author)) {
+                    if (this.followedIDs.includes(this.authorID)) {
                         this.authorClass= 'followedParent';
                     } else {
                         this.authorClass= 'notFollowedParent';
@@ -51,6 +51,15 @@
             }
         },
         mounted() {
+            if (this.author) {
+                if (this.followedIDs.includes(this.authorID)) {
+                    this.authorClass= 'followedParent';
+                } else {
+                    this.authorClass= 'notFollowedParent';
+                }
+            } else {
+                this.authorClass= 'notFollowedParent';
+            }
             this.overlay = this.author ? 'dimmed' : 'deleted';
         },
         methods: {
@@ -137,6 +146,7 @@
         width: 90%;
         margin-top: 10px;
         margin-bottom: 10px;
+        cursor: pointer;
     }
 
 

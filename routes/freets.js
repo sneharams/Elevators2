@@ -60,7 +60,8 @@ router.get(
     ],
     (req, res) => {
         const followed = Users.getUserFollowed(req.session.user_id);
-        const freets = Freets.findAll().filter(freet => followed.includes(freet.author));
+        const followed_ids = followed.map(author => author.user_id);
+        const freets = Freets.findAll().filter(freet => followed_ids.includes(freet.author_id));
         const msg = {
             msg: `Freets by Followed Authors`,
             freets: freets

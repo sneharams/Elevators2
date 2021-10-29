@@ -18,11 +18,12 @@
                 v-bind:freetContent="freet.content"
                 v-bind:edited="freet.edited"
                 v-bind:author="freet.author"
+                v-bind:authorID="freet.author_id"
                 v-bind:upvoteNum="freet.upvotes"
                 v-bind:user="user" 
                 v-bind:key="freet.id"
                 v-bind:parentID="freet.parent_id"
-                v-bind:followed="followed"
+                v-bind:followedIDs="followedIDs"
                 v-bind:upvotes="upvotes"
                 v-on:edit="editHandler"
                 v-on:delete="deleteHandler"
@@ -40,7 +41,7 @@
     export default {
         name: 'Response',
         components: {Freet},
-        props: ['response', 'user', 'followed', 'upvotes'],
+        props: ['response', 'user', 'followedIDs', 'upvotes'],
         data () {
             return {
                 selected: 1,
@@ -77,8 +78,8 @@
             },
             followedHandler(obj) {
                 const authors = obj.data.followed;
-                console.log(authors);
-                this.$emit('followedHandler', authors);
+                const authorIDs = obj.data.followed_ids;
+                this.$emit('followedHandler', authors, authorIDs);
             },
             voteHandler(obj) {
                 if (this.options.length < 5) {

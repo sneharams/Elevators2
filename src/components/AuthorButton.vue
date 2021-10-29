@@ -1,11 +1,11 @@
 <template>
-    <input type="button" :value="author" v-on:click="clickHandler" />
+    <input type="button" :value="authorName" v-on:click="clickHandler" />
 </template>
 
 <script>
 export default {
     name: 'AuthorButton',
-    props: ['author'],
+    props: ['author', 'authorName'],
     methods: {
         clickHandler() {
             this.$emit('authorHandler', this.author);

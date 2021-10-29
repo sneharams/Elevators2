@@ -113,6 +113,20 @@ const authorExists = (req, res, next) => {
     next();
 };
 
+// Checks that the ID of author exists
+const authorIDExists = (req, res, next) => {
+    let id = req.params.author_id;
+    const user = Users.findUserByID(id);
+    if (!user) {
+        // don't want to expose ID to client
+        res.status(404).json({
+            error: `A user with that ID doesn't exist.`,
+        }).end();
+        return;
+    }
+    next();
+};
+
 // Checks that an author is inputted
 const authorInputted = (req, res, next) => {
     if (req.params.author == undefined) {
@@ -187,9 +201,11 @@ const freetIsUpvoted = (req, res, next) => {
 // Checks that the user has already followed the author
 const authorIsFollowed = (req, res, next) => {
     const followed = Users.getUserFollowed(req.session.user_id);
-    if (!followed.includes(req.params.author)) {
+    const followed_ids = followed.map(author => author.user_id);
+    if (!followed_ids.includes(req.params.author_id)) {
+        const author = Users.findUserByID(req.params.author_id);
         res.status(409).json({
-            error: `Author: ${req.params.author} wasn't followed previously.`
+            error: `Author: ${author.username} wasn't followed previously.`
         }).end();
         return;
     }
@@ -199,9 +215,11 @@ const authorIsFollowed = (req, res, next) => {
 // Checks that the user hasn't already followed the author
 const authorIsNotFollowed = (req, res, next) => {
     const followed = Users.getUserFollowed(req.session.user_id);
-    if (followed.includes(req.params.author)) {
+    const followed_ids = followed.map(author => author.user_id);
+    if (followed_ids.includes(req.params.author_id)) {
+        const author = Users.findUserByID(req.params.author_id);
         res.status(409).json({
-            error: `Author: ${req.params.author} was already followed.`
+            error: `Author: ${author.username} was already followed.`
         }).end();
         return;
     }
@@ -220,6 +238,7 @@ module.exports = Object.freeze({
     userIsLoggedIn,
     userIsLoggedOut,
     authorExists,
+    authorIDExists,
     authorInputted,
     freetExists,
     freetIsByUser,

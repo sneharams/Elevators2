@@ -44,8 +44,9 @@
                 v-bind:content="parent.content"
                 v-bind:edited="parent.edited"
                 v-bind:id="parent.id"
+                v-bind:authorID="parent.author_id"
                 v-bind:user="user"
-                v-bind:followed="followed"
+                v-bind:followedIDs="followedIDs"
                 v-on:error="error"
                 v-on:success="freetSuccess"
             />
@@ -87,7 +88,7 @@
     import ParentFreet from './ParentFreet.vue';
     export default {
         name: 'Freet',
-        props: ['freet', 'author', 'freetContent', 'edited', 'upvoteNum', 'user', 'followed', 'parentID', 'upvotes'],
+        props: ['freet', 'author', 'freetContent', 'edited', 'authorID', 'upvoteNum', 'user', 'followedIDs', 'parentID', 'upvotes'],
         components: {ParentFreet},
         data() {
             return {
@@ -104,7 +105,9 @@
                 parent: {
                     id: null,
                     content: null,
-                    author: null
+                    author: null,
+                    edited: null,
+                    author_id: null
                 }
             }
         },
@@ -119,8 +122,8 @@
                     this.parent = null;
                 }
             },
-            followed: function() {
-                if (this.followed.includes(this.freet.author)) {
+            followedIDs: function() {
+                if (this.followedIDs.includes(this.authorID)) {
                     this.authorClass= 'followed';
                     this.isFollowing='Following';
                 } else {
@@ -166,7 +169,7 @@
             }
         },
         beforeMount() {
-            if (this.followed.includes(this.freet.author)) {
+            if (this.followedIDs.includes(this.authorID)) {
                 this.authorClass= 'followed';
                 this.isFollowing='Following';
             } else {
@@ -208,7 +211,7 @@
             },
             followHandler() {
                 const fields = {
-                    author: this.freet.author
+                    author_id: this.authorID
                 }
                 if (this.isFollowing == "Following") {
                     removeAuthorFromFollowed(fields, this.followSuccess, this.error);
@@ -293,7 +296,8 @@
                     author: null,
                     content: null,
                     id: this.parentID,
-                    edited: null
+                    edited: null,
+                    authorID: null
                 }  
             }
         }
