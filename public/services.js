@@ -1,13 +1,3 @@
-// DIDN'T USE
-// Show an object on the screen.
-// function showObject(obj) {
-//   const pre = document.getElementById('response');
-//   const preParent = pre.parentElement;
-//   pre.innerText = JSON.stringify(obj, null, 4);
-//   preParent.classList.add('flashing');
-//   setTimeout(() => preParent.classList.remove('flashing'), 300);
-// }
-
 // Axios responses have a lot of data. This shows only the most relevant data.
 function showResponse(axiosResponse, callback) {
   const fullResponse = axiosResponse.response === undefined
@@ -44,7 +34,6 @@ function createUser(fields, callbackSuccess, callbackFailure) {
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
-
 
 function changeUsername(fields, callbackSuccess, callbackFailure) {
   axios.put('/api/users/username', fields)
@@ -159,39 +148,3 @@ function unvoteFreet(fields, callbackSuccess, callbackFailure) {
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
-
-
-
-// Map form (by id) to the function that should be called on submit
-// const formsAndHandlers = {
-//   'create-user': createUser,
-//   'delete-user': deleteUser,
-//   'change-username': changeUsername,
-//   'change-password': changePassword,
-//   'sign-in': signIn,
-//   'sign-out': signOut,
-//   'view-all-freets': viewAllFreets,
-//   'view-freets-by-author': viewFreetsByAuthor,
-//   'create-freet': createFreet,
-//   'edit-freet': editFreet,
-//   'delete-freet': deleteFreet,
-// };
-
-// // Attach handlers to forms
-// function init() {
-//   Object.entries(formsAndHandlers).forEach(([formID, handler]) => {
-//     const form = document.getElementById(formID);
-//     form.onsubmit = (e) => {
-//       e.preventDefault();
-//       const data = {};
-//       (new FormData(form)).forEach((value, key) => {
-//         data[key] = value;
-//       });
-//       handler(data);
-//       return false; // Don't reload page
-//     };
-//   });
-// }
-
-// Attach handlers once DOM is ready
-// window.onload = init; 
