@@ -46,6 +46,31 @@ router.get(
 });
 
 /**
+ * List all freets by author with id :author_id.
+ * 
+ * @id GET api/freets/author_id/:author_id
+ * 
+ * @param  {string} author_id - id of author
+ * @return {Freets[]} - list of all stored freets by author
+ * @throws {403} - if the user isn't logged in (can only call by id through followed)
+ * @throws {404} - if the id of author doesn't exist
+ */
+ router.get(
+    '/author_id/:author_id?', 
+    [
+        validateThat.userIsLoggedIn,
+        validateThat.authorIDExists
+    ],
+    (req, res) => {
+        const author = Users.findUserByID(req.params.author_id);
+        const msg = {
+            msg: `Freets by Author: ${author.username}`,
+            freets: Freets.findAllByAuthor(author.username)
+        }
+        res.status(200).json(msg).end();
+});
+
+/**
  * List all freets by authors that the user follows.
  * 
  * @id GET api/freets/followed

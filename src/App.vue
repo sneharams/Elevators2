@@ -26,6 +26,7 @@
           v-bind:followed="followed"
           v-bind:followedIDs="followedIDs"
           v-on:freetHandler="success"
+          v-on:followedHandler="followedHandler"
           v-on:errorHandler="error"
         />
         <Response 

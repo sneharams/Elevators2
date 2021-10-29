@@ -90,7 +90,7 @@ const userIsLoggedIn = (req, res, next) => {
 // Checks that the username isn't set in session, i.e., user logged out
 const userIsLoggedOut = (req, res, next) => {
     if (req.session.user_id != null) {
-        const username = Users.findUserById(req.session.user_id).username;
+        const username = Users.findUserByID(req.session.user_id).username;
         res.status(403).json({
             error: 'You must be logged out!',
             username: username

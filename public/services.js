@@ -101,6 +101,12 @@ function viewFreetsByAuthor(fields, callbackSuccess, callbackFailure) {
     .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
 }
 
+function viewFreetsByAuthorID(fields, callbackSuccess, callbackFailure) {
+  axios.get('/api/freets/author_id/'+ fields.author_id, fields)
+    .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
+    .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
+}
+
 function viewFreetByID(fields, callbackSuccess, callbackFailure) {
   axios.get('/api/freets/id/'+ fields.id, fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)

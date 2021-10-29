@@ -60,10 +60,10 @@
             authorHandler(author) {
                 const fields = {
                     author_id: author.user_id
-                }
-                viewFreetsByAuthor(fields, this.success, this.error);
-                localStorage.lastCall = 'author';
-                localStorage.author = author.username;
+                };
+                viewFreetsByAuthorID(fields, this.success, this.error);
+                localStorage.lastCall = 'id';
+                localStorage.author = author.user_id;
             },
             allHandler() {
                 const fields = {};
@@ -72,6 +72,13 @@
             },
             success(obj) {
                 this.$emit('freetHandler', obj);
+                const fields = {};
+                getFollowedAuthors(fields, this.followSuccess, this.error);
+            },
+            followSuccess(obj) {
+                const followed = obj.data.followed;
+                const followedIDs = obj.data.followed_ids;
+                this.$emit('followedHandler', followed, followedIDs);
             },
             error(obj) {
                 this.$emit('errorHandler', obj);
