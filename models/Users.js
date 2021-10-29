@@ -139,8 +139,17 @@ class Users {
      */
     static getUserFollowed(user_id) {
         const user = Users.findUserByID(user_id);
-        const followingNames = user.following.map(author => author.username);
-        return followingNames;
+        let following = [];
+        let names = [];
+        for (let i = 0; i < user.following.length; i++) {
+            const author = Users.findUserByID(user.following[i].id);
+            if (author) {
+                following.push(author);
+                names.push(author.username);
+            }
+        }
+        user.following = following;
+        return names;
     }
 
     /**
