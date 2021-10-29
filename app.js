@@ -69,7 +69,9 @@ app.all('*', (req, res) => {
       <br>
       GET /#/api/freets -- View all freets on the server
       <br>
-      GET /#/api/freets/:author -- View all freets on the server by the user with the username :author
+      GET /#/api/freets/author/:author -- View all freets on the server by the user with the username :author
+      <br>
+      GET /#/api/freets/author_id/:author_id -- View all freets on the server by the user with the user id :author_id
       <br>
       GET /#/api/freets/followed -- View all freets on the server by that are created by authors followed by the currently logged-in user
       <br>
