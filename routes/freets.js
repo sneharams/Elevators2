@@ -76,6 +76,7 @@ router.get(
  * @param  {string} content - content freet contains
  * @return {Freets[]} - the created freet in an array
  * @throws {403} - if the user isn't logged in
+ * @throws {400} - if the freet isn't within the character limit
  */
 router.post(
     '/', 
@@ -102,6 +103,7 @@ router.post(
  * @return {Freets[]} - the updated freet in an array
  * @throws {403} - if the user isn't logged in or if the freet isn't authored by the logged in user
  * @throws {404} - if the freet does not exist
+ * @throws {400} - if the freet isn't within the character limit
  */
 router.put(
     '/id/:id?', 
@@ -228,6 +230,8 @@ router.get(
  * @param  {string} parent_id - id of the freet user is refreeting 
  * @return {Freets[]} - the created freet in an array
  * @throws {403} - if the user isn't logged in
+ * @throws {400} - if the freet isn't within the character limit
+ * @throws {404} - if the freet does not exist
  */ 
  router.post( 
     '/id/:id?', 

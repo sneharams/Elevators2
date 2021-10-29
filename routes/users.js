@@ -182,6 +182,8 @@ router.get(
  * 
  * @return  {string[]} - an array of usernames of authors
  * @throws  {403} - if the user isn't logged in
+ * @throws  {404} - if the author doesn't exist
+ * @throws  {409} - if the author is already followed
  */
 router.put(
     '/followed/:author?',
@@ -207,6 +209,8 @@ router.put(
  * 
  * @return  {string[]} - an array of usernames of authors
  * @throws  {403} - if the user isn't logged in
+ * @throws  {404} - if the author doesn't exist
+ * @throws  {409} - if the author isn't already followed
  */
  router.delete(
     '/followed/:author?',

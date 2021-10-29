@@ -160,6 +160,7 @@ const freetTextIsWithinLimit = (req, res, next) => {
     next();
 };
 
+// Checks that the user has not already upvoted the freet
 const freetIsNotUpvoted = (req, res, next) => {
     const user = Users.findUserByID(req.session.user_id);
     if (user.upvotes.includes(req.params.id)) {
@@ -171,6 +172,7 @@ const freetIsNotUpvoted = (req, res, next) => {
     next();
 }
 
+// Checks that the user has already upvoted the freet
 const freetIsUpvoted = (req, res, next) => {
     const user = Users.findUserByID(req.session.user_id);
     if (!user.upvotes.includes(req.params.id)) {
@@ -182,6 +184,7 @@ const freetIsUpvoted = (req, res, next) => {
     next();
 }
 
+// Checks that the user has already followed the author
 const authorIsFollowed = (req, res, next) => {
     const followed = Users.getUserFollowed(req.session.user_id);
     if (!followed.includes(req.params.author)) {
@@ -193,6 +196,7 @@ const authorIsFollowed = (req, res, next) => {
     next();
 }
 
+// Checks that the user hasn't already followed the author
 const authorIsNotFollowed = (req, res, next) => {
     const followed = Users.getUserFollowed(req.session.user_id);
     if (followed.includes(req.params.author)) {
