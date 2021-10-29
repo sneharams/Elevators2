@@ -37,7 +37,7 @@
                     </div>
                 </section>
             </span>
-            <div class="content">{{ freetContent }} {{ edited }} </div>
+            <p class="content">{{ freetContent }} {{ edited }} </p>
             <ParentFreet 
                 v-if="parentID"
                 v-bind:author="parent.author"
@@ -49,7 +49,6 @@
                 v-on:error="error"
                 v-on:success="freetSuccess"
             />
-            <div class="error" v-if="messageIf">{{message}}</div>
             <div class="editor" v-if="isEditing">
                 <section class="editHeader">
                 <label> {{ inputTitle }}</label>
@@ -61,6 +60,7 @@
                 <textarea v-model="content"/>
                 
             </div>
+            <p class="error" v-if="messageIf">{{message}}</p>
             <div class="actions" v-if="!isEditing">
                 <h4 class="votes">
                     <!-- update to be dynamic with upvotes on actual freet-->
@@ -319,7 +319,20 @@
         display: inline-flex;
     }
 
+    .error {
+        color: white;
+        border: solid;
+        border-color: rgba(255,0,0,0.4);
+        background-color: rgba(255,0,0,0.2);
+        border-radius: 4px 4px 4px 4px;
+        border-width: 1px;
+        padding-top: 5px;
+        margin-top: 5px;
+        text-align: center;
+    }
+
     .options {
+        margin-top: -2px;
         width: 24px;
         height: 24px;
         display: flex;
@@ -481,6 +494,7 @@
         padding-top: 10px;
         border-color: slategray;
         margin-top: 4px;
+        word-wrap:break-word;
     }
 
     .voteButton {

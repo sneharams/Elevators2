@@ -118,11 +118,11 @@
         color: black;
         border-top: solid;
         border-width: 1px;
-        padding-top: 10px;
         border-color: slategray;
-        margin-top: 10px;
+        padding: 10px;
         display: flex;
         flex-direction: column;
+        white-space: pre-wrap;
     }
 
     .borderbox {

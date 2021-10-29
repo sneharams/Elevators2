@@ -114,7 +114,7 @@
     .search {
         padding-top: 0px;
         padding-bottom: 0px;
-        padding-left: 5px;
+        padding-left: 10px;
         margin-left: 10px;
         flex: 1;
         max-width: 400px;

@@ -31,6 +31,7 @@
                 v-on:vote="voteHandler"
             />
         </ol>
+        <footer/>
     </section>
 </template>
 
@@ -80,8 +81,10 @@
                 this.$emit('followedHandler', authors);
             },
             voteHandler(obj) {
-                this.options.push({text: 'Current', value: 5});
-                this.selected = 5;
+                if (this.options.length < 5) {
+                    this.options.push({text: 'Current', value: 5});
+                    this.selected = 5;
+                }
                 this.$emit('vote', obj);
             },
             successHandler(message, freets) {
@@ -110,16 +113,15 @@
         padding-bottom: 10px;
         margin-top: 0px;
         margin-bottom: 0px;
-        background-color: #E5ECF5;
+        background-color: var(--offlightblue);
         color: var(--std-color);
         text-align: center;
+        box-shadow: 0px 2px 4px var(--darkblue);
+        clip-path: inset(0px -4px -4px -4px);
     }
 
     .scrollbox {
         visibility: visible;
-        border-bottom: solid;
-        border-bottom-width: 2vh;
-        border-color: #E5ECF5;
         flex-grow: 1;
         padding-left: 20px;
         padding-right: 20px;
@@ -134,6 +136,16 @@
 
     .sortbar {
         height: 20px;
+        margin-bottom: 0px;
+    }
+
+    footer {
+        position: absolute;
+        bottom: 0px;
+        height: 2vh;
+        width: 100%;
+        background-color:var(--offlightblue);
+        box-shadow: 0px -2px 4px var(--darkblue);
     }
 
     /* customize scrollbar for dark theme */
@@ -142,9 +154,9 @@
         height: 2vh; /* for horizontal scrollbars */
     }
     ::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.1);
+        background: rgba(111, 143, 186, 0.1);
     }
     ::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.2);
+        background: rgba(111, 143, 186, 0.2);
     }
 </style>

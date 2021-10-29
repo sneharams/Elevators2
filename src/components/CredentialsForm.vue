@@ -1,16 +1,16 @@
 <template>
-    <form>
+    <form v-bind:class="credClass">
         <div>
             <label>Username</label>
             <input type="text" v-model="username">
         </div>
         <div>
             <label>Password</label>
-            <input type="text" v-model="password">
+            <input type="password" v-model="password">
         </div>
-        <div v-if="message.length>0">
+        <p class="error" v-if="message.length>0">
             {{ message }}
-        </div>
+        </p>
         <div>
             <input class="close formbutton" type="button" v-on:click="closeHandler" value="x"/>
             <input class="submit formbutton" type="button" v-on:click="submitHandler" value="Submit"/>
@@ -21,7 +21,7 @@
 <script>
     export default {
         name: 'CredentialsForm',
-        props: ['message'],
+        props: ['message', 'credClass'],
         data() {
             return {
                 username: '',
@@ -47,12 +47,18 @@
 
 <style scoped>
 
+    .error {
+        padding: 5px !important;
+        text-align: left !important;
+        width: 370px !important;
+    }
+
     input {
         border: none;
         height: 34px;
     }
 
-    input[type="text"] {
+    input[type="text"], input[type="password"] {
         width: 290px;
         float: right;
         padding-left: 10px;
@@ -70,9 +76,18 @@
         color: var(--std-color);
         background-color: var(--lightblue);
         width: 400px;
-        margin-right: -5px;
+        margin-right: 6px;
         padding-top: 5px;
+        box-shadow: 0px 2px 4px var(--darkblue);
+        clip-path: inset(0px -4px -4px -4px);
+    }
+
+    .signIn {
         border-radius: 8px 8px 8px 8px;
+    }
+
+    .createAccount {
+        border-radius: 8px 0px 8px 8px;
     }
 
     form > * {
@@ -87,6 +102,7 @@
         margin-top: 10px;
         margin-bottom: 10px;
     }
+
 
     label {
         font-size: 14px;

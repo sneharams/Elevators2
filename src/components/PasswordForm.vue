@@ -2,11 +2,11 @@
     <form>
         <div>
             <label> New Password</label>
-            <input type="text" v-model="username">
+            <input type="password" v-model="password">
         </div>
-        <div :style="{visibility: message.length>0 ? 'visible' : 'hidden'}">
+        <p class="error" v-if="passIf">
             {{ message }}
-        </div>
+        </p>
         <div>
             <input class="close formbutton" type="button" v-on:click="closeHandler" value="x"/>
             <input class="submit formbutton" type="button" v-on:click="submitHandler" value="Submit"/>
@@ -17,9 +17,23 @@
 <script>
     export default {
         name: 'PasswordForm',
-        props: ['message', 'password'],
+        props: ['message'],
+        data() {
+            return {
+                password: '',
+            }
+        },
+        computed: {
+            passIf: function() {
+                if (this.message && this.message.length > 0) {
+                    return true;
+                }
+                return false;
+            }
+        },
         methods: {
             closeHandler() {
+                this.password = '';
                 this.$emit("close");
             },
             submitHandler() {
@@ -30,30 +44,13 @@
 </script>
 
 <style scoped>
-
-    input {
-        border: none;
-        height: 34px;
+    .error {
+        padding: 5px !important;
+        text-align: left !important;
+        width: 410px !important;
     }
 
-    input[type="button"] {
-        background-color: var(--darkblue);
-        color: white;
-        padding: 10px;
-        margin: 4px;
-        font-weight: bold;
-    }
-
-    input[type="button"]:focus {
-        outline: none;
-    }
-
-    input[type="button"]:hover {
-        cursor: pointer;
-        background-color: var(--blue);
-    }
-
-    input[type="text"] {
+    input[type="password"] {
         width: 285px;
         float: right;
         padding-left: 10px;
@@ -65,21 +62,23 @@
     }
 
     form {
-        --darkblue:  #3973ac;
-        --blue:      #6699cc;
-        --lightblue: #9fbfdf;
+        position: relative;
+        z-index: 50;
         font-weight: bold;
         color: White;
-        background-color: var(--blue);
-        width: 400px;
-        margin-right: -5px;
+        background-color: var(--lightblue);
+        width: 440px;
+        margin-right: 6px;
         padding-top: 5px;
+        border-radius: 8px 0px 8px 8px;
+        box-shadow: 0px 2px 4px var(--darkblue);
+        clip-path: inset(0px -4px -4px -4px);
     }
 
     form > * {
         margin-top: 10px;
         margin-left: 10px;
-        width: 380px;
+        width: 420px;
         display: inline-flex;
         justify-content: space-between;
     }
@@ -98,7 +97,7 @@
     }
 
     .formbutton:hover {
-        background-color: var(--lightblue) !important;
+        background-color: var(--offblue) !important;
     }
 
     .close {
@@ -109,6 +108,6 @@
     }
 
     .submit {
-        width: 346px;
+        width: 376px;
     }
 </style>

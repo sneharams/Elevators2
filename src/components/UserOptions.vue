@@ -26,8 +26,9 @@
             <component 
                 :is="dropdown"
                 ref="form"
-                v-on="{credentials: credentialsHandler,close: closeHandler,username: usernameHandler,password: passwordHandler, usernameForm: usernameFormHandler, passwordForm: passwordFormHandler, delete: deleteHandler}"
+                v-on="{credentials: credentialsHandler, close: closeHandler, changeUsername: usernameHandler, changePassword: passwordHandler, usernameForm: usernameFormHandler, passwordForm: passwordFormHandler, delete: deleteHandler}"
                 v-bind:message="message"
+                v-bind:credClass="credClass"
                 v-bind:username="username"
             ></component>
         </div>
@@ -57,6 +58,7 @@
                 username: '',
                 user: '',
                 message: '',
+                credClass: 'signIn',
                 dropdown: CredentialsForm,
             }
         },
@@ -77,6 +79,7 @@
         methods: {
             clickHandler1() {
                 this.dropdown = CredentialsForm;
+                this.credClass = 'signIn';
                 if (!this.isLoggedIn) {
                     if (this.form == 'hidden' || this.button2 == 'openForm') {
                     this.dropdown = CredentialsForm;
@@ -94,6 +97,7 @@
                 }
             },
             clickHandler2() {
+                this.credClass = 'createAccount';
                 if (!this.isLoggedIn) {
                     this.dropdown = CredentialsForm;
                 } else {
@@ -216,6 +220,18 @@
         margin-right: 6px;
         margin-top: -6px;
         height: 12px;
+    }
+
+    .error {
+        color: white;
+        border: solid;
+        border-color: rgba(255,0,0,0.4);
+        background-color: rgba(255,0,0,0.2);
+        border-radius: 4px 4px 4px 4px;
+        border-width: 1px;
+        padding: 5px;
+        margin-top: 5px;
+        
     }
 
     .closedForm input {

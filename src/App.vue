@@ -41,6 +41,12 @@
           v-on:sort="sortHandler"
         />
       </span>
+      <div id="delete modal" :style="{display: modalDisplay}" class="modal">
+        <div class="modal-content">
+          <input type="button" v-on:click="modalHandler" class="close" value="Close"/>
+          <p>Freet with ID: {{ deleteID }} deleted</p>
+        </div>
+      </div>
     </main>
 </template>
     
@@ -65,7 +71,9 @@
                 followed: [],
                 upvotes: [],
                 refresh: 0,
-                sortType: 1
+                sortType: 1,
+                deleteID: '',
+                modalDisplay: 'none'
             }
         },
         computed: {
@@ -161,21 +169,25 @@
               const freets = this.responseProps.freets;
               for (let i = 0; i < freets.length; i++) {
                 if (freets[i].id == obj.data.freets[0].id) {
-                  this.responseProps.freets[i] = obj.data.freets[0];
+                  freets[i] = obj.data.freets[0];
                   break;
                 }
               }
+              this.responseProps = {
+                message: this.responseProps.message,
+                freets: freets
+              };
             },
             deleteHandler(obj) {
-              const freets = this.responseProps.freets;
+              let freets = this.responseProps.freets;
               const id = obj.data.freets[0].id;
-              for (let i = 0; i < freets.length; i++) {
-                if (freets[i].id == id) {
-                  this.responseProps.freets[i].content = "deleted";
-                  break;
-                }
-              }
+              freets = freets.filter(freet => freet.id != id);
+              this.deleteID = id;
               this.responseProps.freets = freets;
+              this.modalDisplay = 'block';
+            },
+            modalHandler() {
+              this.modalDisplay = 'none';
             },
             voteHandler(obj){
               const freets = this.responseProps.freets;
@@ -280,6 +292,7 @@
   --blue:      #8EB1D9;
   --offblue:   #ADC4DD;
   --lightblue: #CAD5E3;
+  --offlightblue: #E5ECF5;
   --stdheight: 34px;
   display: flex;
   flex-direction: column;
@@ -346,11 +359,38 @@ h1:hover {
 html, body, #app {
   height: 100vh;
   margin: 0px;
+  overflow: hidden;
 }
 
 .logo {
   width: 40px;
   height: 40px;
   margin-left: 5px;
+}
+
+.modal {
+  position: fixed; 
+  z-index: 1; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
+  background-color: rgba(255,255,255, 0.4);
+}
+
+.modal-content {
+  color: white;
+  background-color: var(--blue);
+  margin: 15% auto; 
+  padding: 20px;
+  width: 80%; 
+  border-radius: 8px 8px 8px 8px;
+  box-shadow: 0px 2px 4px var(--darkblue);
+}
+
+.close {
+  float: right;
+  font-weight: bold;
 }
 </style>

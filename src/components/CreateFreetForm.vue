@@ -2,9 +2,10 @@
     <form class="box">
         <label>Content:</label>
         <textarea v-model="content"/>
-        <div v-if="message.length>0">
+        <section class="rem"> Characters Remaining: {{ remChars }} </section>
+        <p class="error" v-if="message.length>0">
             {{ message }}
-        </div>
+        </p>
         <div>
             <input class="close formbutton" type="button" v-on:click="closeHandler" value="x"/>
             <input class="submit formbutton" type="button" v-on:click="submitHandler" value="Submit"/>
@@ -19,7 +20,16 @@
         data() {
             return {
                 content: '',
-                message: ''
+                message: '',
+                remChars: 140
+            }
+        },
+        watch: {
+            content: function() {
+                if (this.content.length > 140) {
+                    this.content = this.content.substring(0,140);
+                }
+                this.remChars = 140-this.content.length;
             }
         },
         methods: {
@@ -47,7 +57,27 @@
 
 <style scoped>
 
+    .rem {
+        position: relative;
+        top: -10px;
+        margin-bottom: -10px !important;
+        padding-bottom: 0px !important;
+        color: var(--darkblue);
+        font-size: 10px;
+    }
 
+    .error {
+        color: white;
+        border: solid;
+        border-color: rgba(255,0,0,0.4);
+        background-color: rgba(255,0,0,0.2);
+        border-radius: 4px 4px 4px 4px;
+        border-width: 1px;
+        margin-top: 5px;
+        padding: 5px !important;
+        text-align: left !important;
+        width: 370px !important;
+    }
 
     .form {
         display: flex;
@@ -89,6 +119,7 @@
 
     .formbutton {
         margin: 0px !important;
+        margin-top: -10px !important;
     }
 
     .formbutton:hover {
