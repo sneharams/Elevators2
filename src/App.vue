@@ -19,7 +19,15 @@
             v-on:cancel="handleCancel"
           />
         </div>
-        
+        <input 
+          v-if="id == null"
+          type="button" 
+          value="Join Game"
+          v-on:click="handleJoin"
+        />
+        <div v-if="id != null">
+          You're id is {{ id }}
+        </div>
         <div class="chat-container">
           <p> Chats </p>
           <Chats/>
@@ -44,7 +52,8 @@
         active_r: 5,
         active_c: 5,
         rem_elevators: 2,
-        move_elevator: false
+        move_elevator: false,
+        id: null
       }
     },
 
@@ -85,6 +94,16 @@
     },
 
     methods: {
+      handleJoin() {
+        const fields = {};
+        addFloor(fields, this.joinSuccess, this.joinFailure);
+      },
+      joinSuccess(res) {
+        this.id = res.data.id;
+      },
+      joinFaliure(res) {
+        console.log("uh oh");
+      },
       handleCancel() {
         this.move_elevator = false;
       },

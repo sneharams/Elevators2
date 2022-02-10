@@ -29,6 +29,14 @@ function showResponse(axiosResponse, callback) {
  * CallbackSuccess is a function that formats and displays a successful response
  * CallbackFailure is a function that formats and displays a failed response
  */
+
+function addFloor(fields, callbackSuccess, callbackFailure) {
+  axios.post('/api/floors')
+    .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
+    .catch(response => showResponse(response, callbackFailure)); // on failure (Other Status Code)
+}
+
+// OLD
 function createUser(fields, callbackSuccess, callbackFailure) {
   axios.post('/api/users', fields)
     .then(response => showResponse(response, callbackSuccess)) // on success (Status Code 200)
