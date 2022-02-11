@@ -6,6 +6,9 @@
     />
     <div class="options">
       <div>
+        <div class="info-container">
+          <Timer/>
+        </div>
         <div class="options-container">
           <p> {{ title }} </p>
           <Options
@@ -42,10 +45,11 @@
   import Options from './components/Options.vue';
   import Grid from './components/Grid.vue';
   import Chats from './components/Chats.vue';
+  import Timer from './components/Timer.vue';
 
   export default {
     name: 'app',
-    components: {Options, Grid, Chats},
+    components: {Options, Grid, Chats, Timer},
     data() {
       return {
         cells: [],
